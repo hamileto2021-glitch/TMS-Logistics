@@ -1,0 +1,26 @@
+# ASP.NET Core
+bin/
+obj/
+.vs/
+
+# Flutter
+build/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+
+# Android
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/.symlinks/
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
