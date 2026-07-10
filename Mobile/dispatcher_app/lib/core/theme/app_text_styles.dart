@@ -3,26 +3,34 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 class AppTextStyles {
-  static const TextStyle heading = TextStyle(
-    fontSize: 22,
+  AppTextStyles._();
+
+  static const TextStyle pageTitle = TextStyle(
+    fontSize: 28,
     fontWeight: FontWeight.bold,
-    color: AppColors.textPrimary,
+    color: AppColors.title,
   );
 
-  static const TextStyle title = TextStyle(
-    fontSize: 18,
-    fontWeight: FontWeight.w600,
-    color: AppColors.textPrimary,
+  static const TextStyle sectionTitle = TextStyle(
+    fontSize: 20,
+    fontWeight: FontWeight.bold,
+    color: AppColors.title,
   );
 
-  static const TextStyle body = TextStyle(
-    fontSize: 14,
-    color: AppColors.textSecondary,
+  static const TextStyle cardNumber = TextStyle(
+    fontSize: 34,
+    fontWeight: FontWeight.bold,
+    color: AppColors.title,
   );
 
-  static const TextStyle button = TextStyle(
+  static const TextStyle cardTitle = TextStyle(
     fontSize: 16,
-    fontWeight: FontWeight.bold,
-    color: Colors.white,
+    fontWeight: FontWeight.w600,
+    color: AppColors.title,
+  );
+
+  static const TextStyle subtitle = TextStyle(
+    fontSize: 13,
+    color: AppColors.subtitle,
   );
 }

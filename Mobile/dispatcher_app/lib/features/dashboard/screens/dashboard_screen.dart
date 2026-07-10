@@ -17,6 +17,7 @@ import '../models/dashboard.dart';
 import '../services/dashboard_service.dart';
 import '../../tracking/screens/live_tracking_screen.dart';
 import '../../../core/widgets/app_drawer.dart';
+import '../widgets/dashboard_live_map.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -82,12 +83,14 @@ return ListView(
             ),
 
             DashboardStatistics(
+
 customers: dashboard.customers,
 shipments: dashboard.shipments,
 dispatches: dashboard.dispatches,
 trips: dashboard.trips,
 vehicles: dashboard.vehicles,
 drivers: dashboard.drivers,
+
 
               onCustomersTap: () {
                 Navigator.push(
@@ -143,6 +146,7 @@ drivers: dashboard.drivers,
                 );
               },
             ),
+            const DashboardLiveMap(),
 
             DashboardQuickActions(
               onAddCustomer: () {
