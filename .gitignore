@@ -1,26 +1,27 @@
-# ASP.NET Core
-bin/
-obj/
-.vs/
-
 # Flutter
-build/
 .dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
 .packages
+.pub/
+build/
 
 # Android
 android/.gradle/
-android/app/build/
 android/local.properties
-
-# iOS
-ios/Pods/
-ios/.symlinks/
 
 # VS Code
 .vscode/
 
+# Visual Studio
+.vs/
+bin/
+obj/
+
 # Logs
 *.log
+
+# User files
+*.user
+*.suo
+
+# Secrets
+appsettings.Development.json
