@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/services/customer_service.dart';
 import '../../../models/customer.dart';
 import 'customer_form_screen.dart';
-import '../../../core/widgets/app_drawer.dart';
+import '../../../core/widgets/navigation/app_drawer.dart';
 
 class CustomerListScreen extends StatefulWidget {
   const CustomerListScreen({super.key});

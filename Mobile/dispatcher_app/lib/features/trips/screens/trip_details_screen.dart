@@ -4,6 +4,11 @@ import '../models/trip.dart';
 import '../services/trip_service.dart';
 
 import '../widgets/trip_status_chip.dart';
+import '../widgets/trip_header_card.dart';
+import '../widgets/trip_section_card.dart';
+import '../widgets/trip_detail_row.dart';
+import '../widgets/trip_metrics_card.dart';
+import '../widgets/trip_timeline_card.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -89,62 +94,80 @@ class _TripDetailsScreenState
 
                 const SizedBox(height: 20),
 
-                _item(
-                  "Trip Number",
-                  trip.tripNumber,
+                TripHeaderCard(trip: trip),
+
+                const SizedBox(height: 16),
+
+                TripSectionCard(
+                  title: "Shipment & Dispatch",
+                  icon: Icons.inventory_2,
+                  child: Column(
+                    children: [
+                      TripDetailRow(
+                        label: "Shipment",
+                        value: trip.shipmentNumber,
+                        icon: Icons.inventory,
+                      ),
+                      TripDetailRow(
+                        label: "Dispatch",
+                        value: trip.dispatchNumber,
+                        icon: Icons.local_shipping,
+                      ),
+                    ],
+                  ),
                 ),
 
-                _item(
-                  "Dispatch",
-                  trip.dispatchNumber,
+                TripSectionCard(
+                  title: "Vehicle & Driver",
+                  icon: Icons.local_shipping,
+                  child: Column(
+                    children: [
+                      TripDetailRow(
+                        label: "Vehicle",
+                        value: trip.vehiclePlateNumber,
+                        icon: Icons.local_shipping,
+                      ),
+                      TripDetailRow(
+                        label: "Driver",
+                        value: trip.driverName,
+                        icon: Icons.person,
+                      ),
+                    ],
+                  ),
                 ),
 
-                _item(
-                  "Shipment",
-                  trip.shipmentNumber,
+                TripSectionCard(
+                  title: "Current Location",
+                  icon: Icons.location_on,
+                  child: TripDetailRow(
+                    label: "Location",
+                    value: trip.currentLocation,
+                    icon: Icons.place,
+                  ),
                 ),
 
-                _item(
-                  "Vehicle",
-                  trip.vehiclePlateNumber,
-                ),
+                TripMetricsCard(trip: trip),
 
-                _item(
-                  "Driver",
-                  trip.driverName,
-                ),
+                TripTimelineCard(trip: trip),
 
-                _item(
-                  "Distance",
-                  "${trip.distanceKm} km",
-                ),
+                if (trip.delayReason.isNotEmpty)
+                  TripSectionCard(
+                    title: "Delay",
+                    icon: Icons.warning,
+                    child: Text(
+                      trip.delayReason,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  ),
 
-                _item(
-                  "Fuel Used",
-                  "${trip.fuelUsed} L",
-                ),
+                if (trip.remarks.isNotEmpty)
+                  TripSectionCard(
+                    title: "Remarks",
+                    icon: Icons.notes,
+                    child: Text(trip.remarks),
+                  ),
 
-                _item(
-                  "Odometer",
-                  "${trip.odometer}",
-                ),
-
-                _item(
-                  "Current Location",
-                  trip.currentLocation,
-                ),
-
-                _item(
-                  "Delay Reason",
-                  trip.delayReason,
-                ),
-
-                _item(
-                  "Remarks",
-                  trip.remarks,
-                ),
-
-                const SizedBox(height: 30),
+                const SizedBox(height: 20),
 
                 Row(
                   children: [

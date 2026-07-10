@@ -1,135 +1,219 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/services/dashboard_service.dart';
-import '../../../core/widgets/app_drawer.dart';
-import '../../../models/dashboard_summary.dart';
-
 import '../widgets/dashboard_header.dart';
-import '../widgets/overview_cards.dart';
-import '../widgets/quick_actions.dart';
-import '../widgets/fleet_status_card.dart';
-import '../widgets/shipment_status_card.dart';
-import '../widgets/recent_activity.dart';
+import '../widgets/dashboard_statistics.dart';
+import '../widgets/dashboard_quick_actions.dart';
+import '../widgets/dashboard_fleet_status.dart';
+import '../widgets/dashboard_recent_activity.dart';
+
+// Import your screens
+import '../../customers/screens/customer_list_screen.dart';
+import '../../shipments/screens/shipment_list_screen.dart';
+import '../../dispatches/screens/dispatch_list_screen.dart';
+import '../../trips/screens/trip_list_screen.dart';
+import '../../vehicles/screens/vehicle_list_screen.dart';
+import '../../drivers/screens/driver_list_screen.dart';
+import '../models/dashboard.dart';
+import '../services/dashboard_service.dart';
+import '../../tracking/screens/live_tracking_screen.dart';
+import '../../../core/widgets/app_drawer.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() =>
+      _DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
-  final DashboardService _dashboardService = DashboardService();
+class _DashboardScreenState
+    extends State<DashboardScreen> {
 
-  late Future<DashboardSummary> _dashboardFuture;
+  final DashboardService _service =
+  DashboardService();
+
+  late Future<Dashboard> _future;
 
   @override
   void initState() {
     super.initState();
-    _dashboardFuture = _dashboardService.getSummary();
+    _future = _service.getDashboard();
   }
 
-  Future<void> _refreshDashboard() async {
+  Future<void> _refresh() async {
     setState(() {
-      _dashboardFuture = _dashboardService.getSummary();
+      _future = _service.getDashboard();
     });
 
-    await _dashboardFuture;
+    await _future;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       drawer: const AppDrawer(),
+      body: RefreshIndicator(
+        onRefresh: _refresh,
 
-      appBar: AppBar(
-        title: const Text("TMS Dashboard"),
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _refreshDashboard,
-          ),
-        ],
-      ),
+child: FutureBuilder<Dashboard>(
+future: _future,
+builder: (context, snapshot) {
 
-      body: FutureBuilder<DashboardSummary>(
-        future: _dashboardFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState ==
-              ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+if (snapshot.connectionState ==
+ConnectionState.waiting) {
+return const Center(
+child: CircularProgressIndicator(),
+);
+}
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(20),
-                child: Text(
-                  snapshot.error.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.red,
+if (snapshot.hasError) {
+return Center(
+child: Text(snapshot.error.toString()),
+);
+}
+
+final dashboard = snapshot.data!;
+
+return ListView(
+          children: [
+
+            const DashboardHeader(
+              userName: "Mohammed",
+            ),
+
+            DashboardStatistics(
+customers: dashboard.customers,
+shipments: dashboard.shipments,
+dispatches: dashboard.dispatches,
+trips: dashboard.trips,
+vehicles: dashboard.vehicles,
+drivers: dashboard.drivers,
+
+              onCustomersTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerListScreen(),
                   ),
+                );
+              },
+
+              onShipmentsTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ShipmentListScreen(),
+                  ),
+                );
+              },
+
+              onDispatchesTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DispatchListScreen(),
+                  ),
+                );
+              },
+
+              onTripsTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const TripListScreen(),
+                  ),
+                );
+              },
+
+              onVehiclesTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const VehicleListScreen(),
+                  ),
+                );
+              },
+
+              onDriversTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DriverListScreen(),
+                  ),
+                );
+              },
+            ),
+
+            DashboardQuickActions(
+              onAddCustomer: () {
+                // TODO:
+                // Navigate to CustomerFormScreen
+              },
+
+              onAddShipment: () {
+                // TODO:
+                // Navigate to ShipmentFormScreen
+              },
+
+              onAddDispatch: () {
+                // TODO:
+                // Navigate to DispatchFormScreen
+              },
+
+              onAddTrip: () {
+                // TODO:
+                // Navigate to TripFormScreen
+              },
+
+              onLiveTracking: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LiveTrackingScreen(),
+                  ),
+                );
+              },
+            ),
+
+DashboardFleetStatus(
+availableVehicles: dashboard.availableVehicles,
+busyVehicles: dashboard.busyVehicles,
+availableDrivers: dashboard.availableDrivers,
+activeTrips: dashboard.activeTrips,
+),
+
+            DashboardRecentActivity(
+              activities: const [
+
+                ActivityItem(
+                  icon: Icons.local_shipping,
+                  title: "TRP-00021 Started",
+                  subtitle: "2 minutes ago",
+                  color: Colors.green,
                 ),
-              ),
-            );
-          }
 
-          if (!snapshot.hasData) {
-            return const Center(
-              child: Text("No dashboard data available."),
-            );
-          }
-
-          final summary = snapshot.data!;
-
-          return RefreshIndicator(
-            onRefresh: _refreshDashboard,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-
-                const DashboardHeader(),
-
-                const SizedBox(height: 20),
-
-                OverviewCards(
-                  summary: summary,
+                ActivityItem(
+                  icon: Icons.inventory,
+                  title: "Shipment Delivered",
+                  subtitle: "15 minutes ago",
+                  color: Colors.blue,
                 ),
 
-                const SizedBox(height: 20),
-
-                const QuickActions(),
-
-                const SizedBox(height: 20),
-
-                FleetStatusCard(
-                  available: summary.availableVehicles,
-                  assigned: 0,
-                  maintenance: 0,
+                ActivityItem(
+                  icon: Icons.person,
+                  title: "Driver Assigned",
+                  subtitle: "35 minutes ago",
+                  color: Colors.orange,
                 ),
-
-                const SizedBox(height: 20),
-
-                ShipmentStatusCard(
-                  pending: summary.pendingShipments,
-                  dispatched: summary.activeDispatches,
-                  delivered: 0,
-                ),
-
-                const SizedBox(height: 20),
-
-                const RecentActivity(),
-
-                const SizedBox(height: 30),
 
               ],
             ),
-          );
-        },
+
+            const SizedBox(height: 30),
+          ],
+);
+},
+),
       ),
     );
   }

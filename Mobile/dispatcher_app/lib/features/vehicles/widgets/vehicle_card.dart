@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/app_status_chip.dart';
 import '../../../models/vehicle.dart';
-import '../vehicle_details_screen.dart';
-import '../vehicle_form_screen.dart';
+import '../screens/vehicle_details_screen.dart';
+import '../screens/vehicle_form_screen.dart';
 
 class VehicleCard extends StatelessWidget {
   final Vehicle vehicle;

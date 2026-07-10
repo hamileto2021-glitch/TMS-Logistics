@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-import '../../core/services/vehicle_service.dart';
-import '../../core/widgets/app_drawer.dart';
-import '../../core/widgets/app_empty_state.dart';
-import '../../core/widgets/app_loading.dart';
-import '../../core/widgets/app_search_bar.dart';
-import '../../core/widgets/confirm_delete_dialog.dart';
-import '../../models/vehicle.dart';
+import '../../../core/services/vehicle_service.dart';
+import '../../../core/widgets/navigation/app_drawer.dart';
+import '../../../core/widgets/feedback/app_empty_state.dart';
+import '../../../core/widgets/feedback/app_loading.dart';
+import '../../../core/widgets/search/app_search_bar.dart';
+import '../../../core/widgets/dialogs/confirm_delete_dialog.dart';
+import '../../../models/vehicle.dart';
 import 'vehicle_form_screen.dart';
-import 'widgets/vehicle_card.dart';
-import 'widgets/vehicle_statistics.dart';
+import '../widgets/vehicle_card.dart';
+import '../widgets/vehicle_statistics.dart';
 
 class VehicleListScreen extends StatefulWidget {
   const VehicleListScreen({super.key});
@@ -165,7 +165,7 @@ class _VehicleListScreenState extends State<VehicleListScreen> {
 
               AppSearchBar(
                 controller: _searchController,
-                hintText:
+                hint:
                 "Search plate, make, model...",
                 onChanged: (value) {
                   setState(() {

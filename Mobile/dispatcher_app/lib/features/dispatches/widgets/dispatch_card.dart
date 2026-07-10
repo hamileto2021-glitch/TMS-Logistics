@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/dispatch.dart';
+import '../models/dispatch.dart';
 
 class DispatchCard extends StatelessWidget {
   final Dispatch dispatch;

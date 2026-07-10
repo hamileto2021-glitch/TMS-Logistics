@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../models/driver.dart';
+import '../../../models/driver.dart';
 
 class DriverDetailsScreen extends StatelessWidget {
   final Driver driver;

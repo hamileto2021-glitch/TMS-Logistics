@@ -23,10 +23,8 @@ class DashboardCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         elevation: 6,
-        shadowColor: Colors.grey.withOpacity(0.3),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18),
-        ),
+        shadowColor: Colors.grey.withValues(alpha: 0.3),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -34,12 +32,8 @@ class DashboardCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 28,
-                backgroundColor: color.withOpacity(0.15),
-                child: Icon(
-                  icon,
-                  size: 30,
-                  color: color,
-                ),
+                backgroundColor: color.withValues(alpha: 0.15),
+                child: Icon(icon, size: 30, color: color),
               ),
 
               Text(

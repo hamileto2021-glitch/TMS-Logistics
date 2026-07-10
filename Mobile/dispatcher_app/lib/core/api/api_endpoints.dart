@@ -6,7 +6,7 @@ class ApiEndpoints {
   static const String login = "$baseUrl/Auth/login";
 
   // Dashboard
-  static const String dashboard = "$baseUrl/Dashboard/summary";
+  static const String dashboard = "$baseUrl/Dashboard";
 
   // Modules
   static const String customers = "$baseUrl/Customers";
@@ -15,4 +15,5 @@ class ApiEndpoints {
   static const String trips = "$baseUrl/Trips";
   static const String vehicles = "$baseUrl/Vehicles";
   static const String drivers = "$baseUrl/Drivers";
+  static const tracking = "$baseUrl/Tracking";
 }

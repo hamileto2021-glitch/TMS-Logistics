@@ -1,23 +1,8 @@
-import 'package:dio/dio.dart';
-
 import '../../models/shipment.dart';
 import '../api/api_client.dart';
 import '../api/api_endpoints.dart';
-import '../storage/token_storage.dart';
 
 class ShipmentService {
-  final TokenStorage _storage = TokenStorage();
-
-  Future<Options> _options() async {
-    final token = await _storage.getToken();
-
-    return Options(
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-    );
-  }
 
   // ==========================
   // GET ALL SHIPMENTS
@@ -25,7 +10,6 @@ class ShipmentService {
   Future<List<Shipment>> getShipments() async {
     final response = await ApiClient.dio.get(
       ApiEndpoints.shipments,
-      options: await _options(),
     );
 
     final List data = response.data;
@@ -41,7 +25,6 @@ class ShipmentService {
   Future<Shipment> getShipment(int id) async {
     final response = await ApiClient.dio.get(
       "${ApiEndpoints.shipments}/$id",
-      options: await _options(),
     );
 
     return Shipment.fromJson(response.data);
@@ -54,7 +37,6 @@ class ShipmentService {
     await ApiClient.dio.post(
       ApiEndpoints.shipments,
       data: shipment.toJson(),
-      options: await _options(),
     );
   }
 
@@ -65,7 +47,6 @@ class ShipmentService {
     await ApiClient.dio.put(
       "${ApiEndpoints.shipments}/${shipment.id}",
       data: shipment.toJson(),
-      options: await _options(),
     );
   }
 
@@ -75,7 +56,6 @@ class ShipmentService {
   Future<void> deleteShipment(int id) async {
     await ApiClient.dio.delete(
       "${ApiEndpoints.shipments}/$id",
-      options: await _options(),
     );
   }
 }

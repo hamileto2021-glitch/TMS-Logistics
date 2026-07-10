@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/dashboard_stat_card.dart';
+import '../../../core/widgets/cards/dashboard_stat_card.dart';
 import '../../../models/shipment.dart';
 
 class ShipmentStatistics extends StatelessWidget {
@@ -38,9 +38,7 @@ class ShipmentStatistics extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         crossAxisSpacing: 12,
         mainAxisSpacing: 12,
-        childAspectRatio: MediaQuery.of(context).size.width > 700
-            ? 1.5
-            : 1.2,
+        childAspectRatio: 0.95,
         children: [
 
           DashboardStatCard(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/dashboard_stat_card.dart';
+import '../../../core/widgets/cards/dashboard_stat_card.dart';
 import '../../../models/vehicle.dart';
 
 class VehicleStatistics extends StatelessWidget {

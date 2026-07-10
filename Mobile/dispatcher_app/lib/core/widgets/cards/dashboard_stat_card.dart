@@ -19,34 +19,21 @@ class DashboardStatCard extends StatelessWidget {
     return Card(
       elevation: 3,
       shadowColor: Colors.black12,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-
             CircleAvatar(
               radius: 18,
-              backgroundColor: color.withOpacity(0.15),
-              child: Icon(
-                icon,
-                color: color,
-                size: 20,
-              ),
+              backgroundColor: color.withValues(alpha: 0.15),
+              child: Icon(icon, color: color, size: 20),
             ),
 
             Text(
               value,
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
 
             Text(

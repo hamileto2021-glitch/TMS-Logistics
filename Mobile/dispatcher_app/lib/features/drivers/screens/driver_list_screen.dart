@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../core/services/driver_service.dart';
-import '../../core/widgets/app_drawer.dart';
-import '../../core/widgets/app_empty_state.dart';
-import '../../core/widgets/app_loading.dart';
-import '../../core/widgets/app_search_bar.dart';
-import '../../core/widgets/confirm_delete_dialog.dart';
+import '../../../core/services/driver_service.dart';
+import '../../../core/widgets/navigation/app_drawer.dart';
+import '../../../core/widgets/feedback/app_empty_state.dart';
+import '../../../core/widgets/feedback/app_loading.dart';
+import '../../../core/widgets/search/app_search_bar.dart';
+import '../../../core/widgets/dialogs/confirm_delete_dialog.dart';
 
-import '../../models/driver.dart';
+import '../../../models/driver.dart';
 
 import 'driver_form_screen.dart';
-import 'widgets/driver_card.dart';
-import 'widgets/driver_statistics.dart';
+import '../widgets/driver_card.dart';
+import '../widgets/driver_statistics.dart';
 
 class DriverListScreen extends StatefulWidget {
   const DriverListScreen({super.key});
@@ -180,7 +180,7 @@ class _DriverListScreenState extends State<DriverListScreen> {
 
               AppSearchBar(
                 controller: _searchController,
-                hintText:
+                hint:
                 "Search driver...",
                 onChanged: (value) {
                   setState(() {

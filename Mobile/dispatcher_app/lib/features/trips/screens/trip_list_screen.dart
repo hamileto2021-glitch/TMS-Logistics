@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/widgets/app_loading.dart';
-import '../../../core/widgets/app_empty_state.dart';
+import '../../../core/widgets/feedback/app_loading.dart';
+import '../../../core/widgets/feedback/app_empty_state.dart';
 
 import '../models/trip.dart';
 import '../services/trip_service.dart';

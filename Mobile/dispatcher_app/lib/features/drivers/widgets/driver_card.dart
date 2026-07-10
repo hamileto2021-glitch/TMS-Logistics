@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/widgets/app_status_chip.dart';
 import '../../../models/driver.dart';
-import '../driver_details_screen.dart';
-import '../driver_form_screen.dart';
+import '../screens/driver_details_screen.dart';
+import '../screens/driver_form_screen.dart';
 
 class DriverCard extends StatelessWidget {
   final Driver driver;

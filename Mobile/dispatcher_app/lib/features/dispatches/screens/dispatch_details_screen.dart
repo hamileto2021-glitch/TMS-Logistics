@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/dispatch.dart';
+import '../models/dispatch.dart';
 import '../../../core/widgets/app_status_chip.dart';
 
 import '../services/dispatch_service.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../models/dashboard_summary.dart';
-import '../../../core/widgets/dashboard_card.dart';
+import '../../../core/widgets/cards/dashboard_card.dart';
 
 class OverviewCards extends StatelessWidget {
   final DashboardSummary summary;

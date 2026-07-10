@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../models/dispatch.dart';
+import '../models/dispatch.dart';
 import '../services/dispatch_service.dart';
 
 import 'dispatch_form_screen.dart';

@@ -1,23 +1,8 @@
-import 'package:dio/dio.dart';
-
 import '../../models/driver.dart';
 import '../api/api_client.dart';
 import '../api/api_endpoints.dart';
-import '../storage/token_storage.dart';
 
 class DriverService {
-  final TokenStorage _storage = TokenStorage();
-
-  Future<Options> _options() async {
-    final token = await _storage.getToken();
-
-    return Options(
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-    );
-  }
 
   // ===========================
   // GET ALL DRIVERS
@@ -25,7 +10,6 @@ class DriverService {
   Future<List<Driver>> getDrivers() async {
     final response = await ApiClient.dio.get(
       ApiEndpoints.drivers,
-      options: await _options(),
     );
 
     final List data = response.data;
@@ -39,7 +23,6 @@ class DriverService {
   Future<Driver> getDriver(int id) async {
     final response = await ApiClient.dio.get(
       "${ApiEndpoints.drivers}/$id",
-      options: await _options(),
     );
 
     return Driver.fromJson(response.data);
@@ -52,7 +35,6 @@ class DriverService {
     await ApiClient.dio.post(
       ApiEndpoints.drivers,
       data: driver.toJson(),
-      options: await _options(),
     );
   }
 
@@ -63,7 +45,6 @@ class DriverService {
     await ApiClient.dio.put(
       "${ApiEndpoints.drivers}/${driver.id}",
       data: driver.toJson(),
-      options: await _options(),
     );
   }
 
@@ -73,7 +54,6 @@ class DriverService {
   Future<void> deleteDriver(int id) async {
     await ApiClient.dio.delete(
       "${ApiEndpoints.drivers}/$id",
-      options: await _options(),
     );
   }
 }
