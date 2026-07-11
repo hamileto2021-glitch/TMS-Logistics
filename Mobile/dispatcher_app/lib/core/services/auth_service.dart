@@ -2,6 +2,7 @@
 import '../api/api_client.dart';
 import '../api/api_endpoints.dart';
 import '../storage/token_storage.dart';
+using Microsoft.OpenApi.Models;
 
 import '../../models/login_request.dart';
 import '../../models/login_response.dart';

@@ -6,13 +6,10 @@ class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key});
 
   @override
-  State<DriverDashboardScreen> createState() =>
-      _DriverDashboardScreenState();
+  State<DriverDashboardScreen> createState() => _DriverDashboardScreenState();
 }
 
-class _DriverDashboardScreenState
-    extends State<DriverDashboardScreen> {
-
+class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
   final TokenStorage _storage = TokenStorage();
 
   String _name = "";
@@ -48,25 +45,18 @@ class _DriverDashboardScreenState
     Navigator.popUntil(context, (route) => route.isFirst);
   }
 
-  Widget buildCard(
-      String title,
-      String value,
-      IconData icon,
-      Color color,
-      ) {
+  Widget buildCard(String title, String value, IconData icon, Color color) {
     return Card(
       elevation: 4,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(.15),
+          backgroundColor: color.withValues(alpha: .15),
           child: Icon(icon, color: color),
         ),
         title: Text(title),
         subtitle: Text(
           value,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -74,16 +64,11 @@ class _DriverDashboardScreenState
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-
       appBar: AppBar(
         title: const Text("Driver Dashboard"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: _logout,
-          )
+          IconButton(icon: const Icon(Icons.logout), onPressed: _logout),
         ],
       ),
 
@@ -91,16 +76,13 @@ class _DriverDashboardScreenState
         padding: const EdgeInsets.all(16),
 
         children: [
-
           const SizedBox(height: 10),
 
           Center(
             child: CircleAvatar(
               radius: 45,
               child: Text(
-                _name.isEmpty
-                    ? "D"
-                    : _name[0].toUpperCase(),
+                _name.isEmpty ? "D" : _name[0].toUpperCase(),
                 style: const TextStyle(fontSize: 28),
               ),
             ),
@@ -111,30 +93,17 @@ class _DriverDashboardScreenState
           Center(
             child: Text(
               _name,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
 
           Center(
-            child: Text(
-              _email,
-              style: const TextStyle(
-                color: Colors.grey,
-              ),
-            ),
+            child: Text(_email, style: const TextStyle(color: Colors.grey)),
           ),
 
           const SizedBox(height: 25),
 
-          buildCard(
-            "Role",
-            _role,
-            Icons.badge,
-            Colors.blue,
-          ),
+          buildCard("Role", _role, Icons.badge, Colors.blue),
 
           buildCard(
             "Driver ID",
@@ -156,19 +125,13 @@ class _DriverDashboardScreenState
             height: 55,
             child: ElevatedButton.icon(
               onPressed: () {
-
                 // Next:
                 // Open My Trips
-
               },
               icon: const Icon(Icons.route),
-              label: const Text(
-                "MY TRIPS",
-                style: TextStyle(fontSize: 18),
-              ),
+              label: const Text("MY TRIPS", style: TextStyle(fontSize: 18)),
             ),
           ),
-
         ],
       ),
     );

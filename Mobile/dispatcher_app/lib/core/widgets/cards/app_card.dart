@@ -32,18 +32,13 @@ class AppCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: color.withOpacity(.15),
-                    child: Icon(
-                      icon,
-                      color: color,
-                    ),
+                    backgroundColor: color.withValues(alpha: .15),
+                    child: Icon(icon, color: color),
                   ),
 
                   const Icon(
@@ -56,24 +51,15 @@ class AppCard extends StatelessWidget {
 
               const Spacer(),
 
-              Text(
-                value,
-                style: AppTextStyles.cardNumber,
-              ),
+              Text(value, style: AppTextStyles.cardNumber),
 
               const SizedBox(height: 6),
 
-              Text(
-                title,
-                style: AppTextStyles.cardTitle,
-              ),
+              Text(title, style: AppTextStyles.cardTitle),
 
               if (subtitle != null) ...[
                 const SizedBox(height: 4),
-                Text(
-                  subtitle!,
-                  style: AppTextStyles.subtitle,
-                ),
+                Text(subtitle!, style: AppTextStyles.subtitle),
               ],
             ],
           ),

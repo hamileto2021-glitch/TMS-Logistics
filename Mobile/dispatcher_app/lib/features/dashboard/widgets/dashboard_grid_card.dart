@@ -20,10 +20,8 @@ class DashboardGridCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 8,
-      shadowColor: color.withOpacity(0.25),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(22),
-      ),
+      shadowColor: color.withValues(alpha: 0.25),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
       child: InkWell(
         borderRadius: BorderRadius.circular(22),
         onTap: onTap,
@@ -32,20 +30,14 @@ class DashboardGridCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-
               /// Top Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-
                   CircleAvatar(
                     radius: 24,
-                    backgroundColor: color.withOpacity(0.15),
-                    child: Icon(
-                      icon,
-                      color: color,
-                      size: 26,
-                    ),
+                    backgroundColor: color.withValues(alpha: 0.15),
+                    child: Icon(icon, color: color, size: 26),
                   ),
 
                   Container(
@@ -54,7 +46,7 @@ class DashboardGridCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(.15),
+                      color: Colors.green.withValues(alpha: .15),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: const Text(
@@ -94,7 +86,6 @@ class DashboardGridCard extends StatelessWidget {
 
               Row(
                 children: [
-
                   Icon(
                     Icons.trending_up,
                     size: 18,
@@ -105,10 +96,7 @@ class DashboardGridCard extends StatelessWidget {
 
                   Text(
                     "Operational",
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.grey.shade700, fontSize: 13),
                   ),
 
                   const Spacer(),
