@@ -4,7 +4,7 @@ class DriverTrip {
   final String shipmentNumber;
   final String origin;
   final String destination;
-  final String status;
+  String status;
   final DateTime? startTime;
   final DateTime? endTime;
 

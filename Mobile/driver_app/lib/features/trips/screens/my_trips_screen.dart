@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/driver_trip.dart';
 import '../services/trip_service.dart';
 import '../widgets/trip_card.dart';
+import 'trip_details_screen.dart';
 
 class MyTripsScreen extends StatefulWidget {
   const MyTripsScreen({super.key});
@@ -67,9 +68,19 @@ class _MyTripsScreenState extends State<MyTripsScreen> {
               itemBuilder: (context, index) {
                 return TripCard(
                   trip: trips[index],
-                  onTap: () {
-                    // Next sprint:
-                    // Navigate to TripDetailsScreen
+                  onTap: () async {
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => TripDetailsScreen(
+                          trip: trips[index],
+                        ),
+                      ),
+                    );
+
+                    if (result == true) {
+                      _refresh();
+                    }
                   },
                 );
               },

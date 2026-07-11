@@ -32,4 +32,24 @@ class TripService {
 
     throw Exception("Failed to load trips");
   }
+  Future<bool> startTrip(int tripId) async {
+    final token = await _tokenStorage.getToken();
+
+    final response = await http.post(
+      Uri.parse("${ApiConstants.baseUrl}/Driver/trips/$tripId/start"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    }
+
+    print("Status Code: ${response.statusCode}");
+    print("Response: ${response.body}");
+
+    throw Exception(response.body);
+  }
 }
