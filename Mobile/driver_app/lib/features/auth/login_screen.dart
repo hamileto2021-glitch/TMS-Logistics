@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../services/auth_service.dart';
 import '../../../models/login_request.dart';
 import '../../../core/storage/token_storage.dart';
-import '../dashboard/dashboard_screen.dart';
+import '../dashboard/screens/driver_dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

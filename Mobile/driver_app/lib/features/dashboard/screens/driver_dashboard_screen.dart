@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../core/storage/token_storage.dart';
+import '../../../core/storage/token_storage.dart';
+import '../../trips/screens/my_trips_screen.dart';
 
 class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key});
@@ -125,11 +126,18 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
             height: 55,
             child: ElevatedButton.icon(
               onPressed: () {
-                // Next:
-                // Open My Trips
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const MyTripsScreen(),
+                  ),
+                );
               },
               icon: const Icon(Icons.route),
-              label: const Text("MY TRIPS", style: TextStyle(fontSize: 18)),
+              label: const Text(
+                "MY TRIPS",
+                style: TextStyle(fontSize: 18),
+              ),
             ),
           ),
         ],
