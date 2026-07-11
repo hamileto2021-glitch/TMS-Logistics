@@ -19,6 +19,9 @@ class FleetService {
       },
     );
 
+    print("Status Code: ${response.statusCode}");
+    print("Response: ${response.body}");
+
     if (response.statusCode != 200) {
       throw Exception("Unable to load live fleet.");
     }
