@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../models/live_trip.dart';
 import '../services/fleet_service.dart';
+import 'live_map_screen.dart';
 
 class LiveFleetScreen extends StatefulWidget {
   const LiveFleetScreen({super.key});
@@ -150,11 +151,15 @@ class _LiveFleetScreenState extends State<LiveFleetScreen> {
 
                     child: ElevatedButton.icon(
 
-                      onPressed: (){
-
-                        // Next Sprint
-                        // Open Google Map
-
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => LiveMapScreen(
+                              trip: trip,
+                            ),
+                          ),
+                        );
                       },
 
                       icon: const Icon(Icons.map),

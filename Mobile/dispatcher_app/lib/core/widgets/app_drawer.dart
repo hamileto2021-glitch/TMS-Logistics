@@ -6,7 +6,7 @@ import '../../features/dispatches/screens/dispatch_list_screen.dart';
 import '../../features/trips/screens/trip_list_screen.dart';
 import '../../features/vehicles/screens/vehicle_list_screen.dart';
 import '../../features/drivers/screens/driver_list_screen.dart';
-import '../../features/tracking/screens/live_tracking_screen.dart';
+import '../../features/fleet/screens/live_fleet_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
 
 class AppDrawer extends StatelessWidget {
@@ -101,9 +101,9 @@ class AppDrawer extends StatelessWidget {
 
           _menu(
             context,
-            Icons.location_on,
-            "Live Tracking",
-            const LiveTrackingScreen(),
+            Icons.local_shipping,
+            "Live Fleet",
+            const LiveFleetScreen(),
           ),
 
           const Spacer(),

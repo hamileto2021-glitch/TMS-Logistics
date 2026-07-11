@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import '../../tracking/screens/live_tracking_screen.dart';
+import '../../fleet/screens/live_fleet_screen.dart';
 
 class DashboardLiveMap extends StatelessWidget {
   const DashboardLiveMap({super.key});
@@ -70,7 +70,7 @@ class DashboardLiveMap extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const LiveTrackingScreen(),
+                      builder: (_) => const LiveFleetScreen(),
                     ),
                   );
                 },
