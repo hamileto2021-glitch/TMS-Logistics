@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../tracking/trip_tracking_manager.dart';
 
 import '../models/driver_trip.dart';
 import '../services/trip_service.dart';
@@ -33,6 +35,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
       if (!mounted) return;
 
       if (success) {
+        await context
+            .read<TripTrackingManager>()
+            .startTracking(trip.id);
         setState(() {
           trip.status = "Started";
         });

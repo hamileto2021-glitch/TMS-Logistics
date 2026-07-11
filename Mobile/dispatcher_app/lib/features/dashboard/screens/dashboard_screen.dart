@@ -15,7 +15,7 @@ import '../../vehicles/screens/vehicle_list_screen.dart';
 import '../../drivers/screens/driver_list_screen.dart';
 import '../models/dashboard.dart';
 import '../services/dashboard_service.dart';
-import '../../tracking/screens/live_tracking_screen.dart';
+import '../../fleet/screens/live_fleet_screen.dart';
 import '../../../core/widgets/app_drawer.dart';
 import '../widgets/dashboard_live_map.dart';
 
@@ -173,7 +173,7 @@ drivers: dashboard.drivers,
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const LiveTrackingScreen(),
+                    builder: (_) => const LiveFleetScreen(),
                   ),
                 );
               },

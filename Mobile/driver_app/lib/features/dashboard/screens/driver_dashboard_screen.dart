@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/storage/token_storage.dart';
 import '../../trips/screens/my_trips_screen.dart';
+import '../../../core/services/location_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key});
@@ -12,6 +14,7 @@ class DriverDashboardScreen extends StatefulWidget {
 
 class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
   final TokenStorage _storage = TokenStorage();
+  final LocationService _locationService = LocationService();
 
   String _name = "";
   String _email = "";
@@ -44,6 +47,45 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
     if (!mounted) return;
 
     Navigator.popUntil(context, (route) => route.isFirst);
+  }
+  Future<void> _testGps() async {
+    final granted = await _locationService.requestPermission();
+
+    if (!granted) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Location permission denied."),
+        ),
+      );
+
+      return;
+    }
+
+    Position position =
+    await _locationService.getCurrentLocation();
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Current GPS"),
+
+        content: Text(
+          "Latitude : ${position.latitude}\n\n"
+              "Longitude : ${position.longitude}",
+        ),
+
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("OK"),
+          )
+        ],
+      ),
+    );
   }
 
   Widget buildCard(String title, String value, IconData icon, Color color) {
@@ -136,6 +178,20 @@ class _DriverDashboardScreenState extends State<DriverDashboardScreen> {
               icon: const Icon(Icons.route),
               label: const Text(
                 "MY TRIPS",
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          SizedBox(
+            height: 55,
+            child: ElevatedButton.icon(
+              onPressed: _testGps,
+              icon: const Icon(Icons.location_on),
+              label: const Text(
+                "TEST GPS",
                 style: TextStyle(fontSize: 18),
               ),
             ),
