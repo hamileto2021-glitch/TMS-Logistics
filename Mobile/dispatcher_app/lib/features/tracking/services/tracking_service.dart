@@ -4,12 +4,13 @@ import 'package:http/http.dart' as http;
 
 import '../../../core/constants/api_constants.dart';
 import '../../../core/storage/token_storage.dart';
+import '../models/vehicle_location.dart';
 
 class TrackingService {
   final TokenStorage _storage = TokenStorage();
 
-  /// Get current location of a trip
-  Future<Map<String, dynamic>> getCurrentLocation(int tripId) async {
+  /// Current location
+  Future<VehicleLocation> getCurrentLocation(int tripId) async {
     final token = await _storage.getToken();
 
     final response = await http.get(
@@ -28,11 +29,13 @@ class TrackingService {
       throw Exception("Unable to retrieve current location.");
     }
 
-    return jsonDecode(response.body);
+    return VehicleLocation.fromJson(
+      jsonDecode(response.body),
+    );
   }
 
-  /// Get full tracking history of a trip
-  Future<List<dynamic>> getTripHistory(int tripId) async {
+  /// Trip history
+  Future<List<VehicleLocation>> getTripHistory(int tripId) async {
     final token = await _storage.getToken();
 
     final response = await http.get(
@@ -51,6 +54,10 @@ class TrackingService {
       throw Exception("Unable to retrieve trip history.");
     }
 
-    return jsonDecode(response.body);
+    final List data = jsonDecode(response.body);
+
+    return data
+        .map((e) => VehicleLocation.fromJson(e))
+        .toList();
   }
 }
