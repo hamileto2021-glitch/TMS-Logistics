@@ -4,6 +4,7 @@ import '../../tracking/trip_tracking_manager.dart';
 
 import '../models/driver_trip.dart';
 import '../services/trip_service.dart';
+import '../../delivery/screens/complete_delivery_screen.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final DriverTrip trip;
@@ -120,14 +121,14 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   trip.status == "Scheduled"
                       ? Icons.play_arrow
                       : trip.status == "Started"
-                      ? Icons.location_on
+                      ? Icons.check_circle
                       : Icons.check_circle,
                 ),
                 label: Text(
                   trip.status == "Scheduled"
                       ? "START TRIP"
                       : trip.status == "Started"
-                      ? "TRACK TRIP"
+                      ? "COMPLETE DELIVERY"
                       : "VIEW SUMMARY",
                   style: const TextStyle(
                     fontSize: 18,
@@ -138,11 +139,20 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                   if (trip.status == "Scheduled") {
                     await _startTrip();
                   } else if (trip.status == "Started") {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("GPS Tracking will be implemented next."),
+                    final result = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => CompleteDeliveryScreen(
+                          trip: trip,
+                        ),
                       ),
                     );
+
+                    if (result == true && mounted) {
+                      setState(() {
+                        trip.status = "Completed";
+                      });
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
