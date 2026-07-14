@@ -1,7 +1,7 @@
-import '../core/api/api_client.dart';
-import '../core/api/api_endpoints.dart';
+import '../api/api_client.dart';
+import '../api/api_endpoints.dart';
 
-import '../features/trips/models/trip.dart';
+import '../../models/trip.dart';
 
 class TripService {
   Future<List<Trip>> getTrips() async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/trip.dart';
-import '../../../services/trip_service.dart';
+import '../../../models/trip.dart';
+import '../../../core/services/trip_service.dart';
 
 import '../widgets/trip_status_chip.dart';
 import '../widgets/trip_header_card.dart';

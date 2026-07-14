@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/trip.dart';
+import '../../../models/trip.dart';
 import 'trip_status_chip.dart';
 
 class TripHeaderCard extends StatelessWidget {

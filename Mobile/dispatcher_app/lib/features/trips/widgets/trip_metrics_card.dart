@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/trip.dart';
+import '../../../models/trip.dart';
 
 class TripMetricsCard extends StatelessWidget {
 

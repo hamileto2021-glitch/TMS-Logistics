@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/trip.dart';
+import '../../../models/trip.dart';
 
 class TripStatistics extends StatelessWidget {
   final List<Trip> trips;
