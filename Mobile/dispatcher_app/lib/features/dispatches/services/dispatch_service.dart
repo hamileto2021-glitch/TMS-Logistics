@@ -1,6 +1,6 @@
 import '../../../core/api/api_client.dart';
 import '../../../core/api/api_endpoints.dart';
-import '../models/dispatch.dart';
+import '../../../models/dispatch.dart';
 
 class DispatchService {
 

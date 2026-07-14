@@ -1,158 +1,144 @@
 import 'package:flutter/material.dart';
 
-import '../services/dispatch_service.dart';
-import '../../../core/services/driver_service.dart';
+import '../../../core/services/dispatch_service.dart';
 import '../../../core/services/shipment_service.dart';
 import '../../../core/services/vehicle_service.dart';
+import '../../../core/services/driver_service.dart';
 
-import '../models/dispatch.dart';
-import '../../../models/driver.dart';
 import '../../../models/shipment.dart';
 import '../../../models/vehicle.dart';
+import '../../../models/driver.dart';
+import '../../../models/create_dispatch_request.dart';
+import '../../../models/dispatch.dart';
 
 class DispatchFormScreen extends StatefulWidget {
   final Dispatch? dispatch;
 
-  const DispatchFormScreen({super.key, this.dispatch});
+  const DispatchFormScreen({
+    super.key,
+    this.dispatch,
+  });
 
   @override
-  State<DispatchFormScreen> createState() => _DispatchFormScreenState();
+  State<DispatchFormScreen> createState() =>
+      _DispatchFormScreenState();
 }
 
 class _DispatchFormScreenState extends State<DispatchFormScreen> {
-  final _formKey = GlobalKey<FormState>();
 
-  final DispatchService _dispatchService = DispatchService();
+  final ShipmentService shipmentService = ShipmentService();
+  final VehicleService vehicleService = VehicleService();
+  final DriverService driverService = DriverService();
+  final DispatchService dispatchService = DispatchService();
 
-  final ShipmentService _shipmentService = ShipmentService();
-
-  final DriverService _driverService = DriverService();
-
-  final VehicleService _vehicleService = VehicleService();
+  final TextEditingController notesController =
+  TextEditingController();
 
   List<Shipment> shipments = [];
-
   List<Vehicle> vehicles = [];
-
   List<Driver> drivers = [];
 
   Shipment? selectedShipment;
-
   Vehicle? selectedVehicle;
-
   Driver? selectedDriver;
 
-  DateTime dispatchDate = DateTime.now();
-
-  final notesController = TextEditingController();
+  DateTime selectedDate = DateTime.now();
 
   bool loading = true;
-
   bool saving = false;
-
-  String status = "Scheduled";
 
   @override
   void initState() {
     super.initState();
-    _loadData();
+    loadData();
   }
 
-  Future<void> _loadData() async {
-    shipments = await _shipmentService.getShipments();
+  Future<void> loadData() async {
+    try {
 
-    vehicles = await _vehicleService.getVehicles();
+      shipments = await shipmentService.getShipments();
 
-    drivers = await _driverService.getDrivers();
+      print("========== SHIPMENTS ==========");
+      for (var s in shipments) {
+        print("${s.shipmentNumber} -> ${s.status}");
+      }
+      print("===============================");
 
-    if (widget.dispatch != null) {
-      final dispatch = widget.dispatch!;
+      vehicles = await vehicleService.getVehicles();
 
-      selectedShipment = shipments.firstWhere(
-        (e) => e.id == dispatch.shipmentId,
-      );
+      drivers = await driverService.getDrivers();
 
-      selectedVehicle = vehicles.firstWhere((e) => e.id == dispatch.vehicleId);
+      final availableShipments = shipments
+          .where((e) => e.status.trim().toLowerCase() == "pending")
+          .toList();
 
-      selectedDriver = drivers.firstWhere((e) => e.id == dispatch.driverId);
+      print("Available shipments: ${availableShipments.length}");
 
-      dispatchDate = dispatch.dispatchDate;
+      shipments = availableShipments;
 
-      notesController.text = dispatch.notes;
+      vehicles = vehicles
+          .where((e) => e.status == "Available")
+          .toList();
 
-      status = dispatch.status;
+      drivers = drivers
+          .where((e) => e.status == "Available")
+          .toList();
+
+    } finally {
+
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+
     }
-
-    if (mounted) {
-      setState(() {
-        loading = false;
-      });
-    }
-  }
-
-  Future<void> _pickDate() async {
-    final date = await showDatePicker(
-      context: context,
-      initialDate: dispatchDate,
-      firstDate: DateTime(2024),
-      lastDate: DateTime(2100),
-    );
-
-    if (date != null) {
-      setState(() {
-        dispatchDate = date;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    notesController.dispose();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+
     if (loading) {
-      return Scaffold(
-        appBar: AppBar(title: const Text("Dispatch")),
-        body: const Center(child: CircularProgressIndicator()),
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
       );
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.dispatch == null ? "New Dispatch" : "Edit Dispatch"),
+        title: const Text("Create Dispatch"),
       ),
 
-      body: Form(
-        key: _formKey,
-
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            const Text(
+              "Shipment",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
+
             DropdownButtonFormField<Shipment>(
-              initialValue: selectedShipment,
+              value: selectedShipment,
               decoration: const InputDecoration(
-                labelText: "Shipment",
                 border: OutlineInputBorder(),
               ),
-
               items: shipments.map((shipment) {
                 return DropdownMenuItem(
                   value: shipment,
-                  child: Text(shipment.shipmentNumber),
+                  child: Text(
+                    "${shipment.shipmentNumber} | ${shipment.origin} → ${shipment.destination}",
+                  ),
                 );
               }).toList(),
-
-              validator: (value) {
-                if (value == null) {
-                  return "Select shipment";
-                }
-                return null;
-              },
-
               onChanged: (value) {
                 setState(() {
                   selectedShipment = value;
@@ -160,31 +146,28 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
+            const Text(
+              "Vehicle",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
 
             DropdownButtonFormField<Vehicle>(
-              initialValue: selectedVehicle,
+              value: selectedVehicle,
               decoration: const InputDecoration(
-                labelText: "Vehicle",
                 border: OutlineInputBorder(),
               ),
-
               items: vehicles.map((vehicle) {
                 return DropdownMenuItem(
                   value: vehicle,
-                  child: Text(
-                    "${vehicle.plateNumber} (${vehicle.vehicleCode})",
-                  ),
+                  child: Text(vehicle.plateNumber),
                 );
               }).toList(),
-
-              validator: (value) {
-                if (value == null) {
-                  return "Select vehicle";
-                }
-                return null;
-              },
-
               onChanged: (value) {
                 setState(() {
                   selectedVehicle = value;
@@ -192,29 +175,28 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
+
+            const Text(
+              "Driver",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 8),
 
             DropdownButtonFormField<Driver>(
-              initialValue: selectedDriver,
+              value: selectedDriver,
               decoration: const InputDecoration(
-                labelText: "Driver",
                 border: OutlineInputBorder(),
               ),
-
               items: drivers.map((driver) {
                 return DropdownMenuItem(
                   value: driver,
                   child: Text(driver.fullName),
                 );
               }).toList(),
-
-              validator: (value) {
-                if (value == null) {
-                  return "Select driver";
-                }
-                return null;
-              },
-
               onChanged: (value) {
                 setState(() {
                   selectedDriver = value;
@@ -222,61 +204,47 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            ListTile(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-                side: const BorderSide(color: Colors.grey),
+            const Text(
+              "Dispatch Date",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
               ),
-
-              leading: const Icon(Icons.calendar_month),
-
-              title: Text(
-                "${dispatchDate.day}/${dispatchDate.month}/${dispatchDate.year}",
-              ),
-
-              trailing: const Icon(Icons.edit_calendar),
-
-              onTap: _pickDate,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
-            DropdownButtonFormField<String>(
-              initialValue: status,
-
-              decoration: const InputDecoration(
-                labelText: "Status",
-                border: OutlineInputBorder(),
+            ListTile(
+              tileColor: Colors.grey.shade200,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
+              title: Text(
+                "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
+              ),
+              trailing: const Icon(Icons.calendar_month),
+              onTap: () async {
+                final picked = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate,
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2035),
+                );
 
-              items: const [
-                DropdownMenuItem(value: "Scheduled", child: Text("Scheduled")),
-
-                DropdownMenuItem(
-                  value: "In Progress",
-                  child: Text("In Progress"),
-                ),
-
-                DropdownMenuItem(value: "Completed", child: Text("Completed")),
-
-                DropdownMenuItem(value: "Cancelled", child: Text("Cancelled")),
-              ],
-
-              onChanged: (value) {
-                setState(() {
-                  status = value!;
-                });
+                if (picked != null) {
+                  setState(() {
+                    selectedDate = picked;
+                  });
+                }
               },
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
 
-            TextFormField(
+            TextField(
               controller: notesController,
               maxLines: 4,
-
               decoration: const InputDecoration(
                 labelText: "Notes",
                 border: OutlineInputBorder(),
@@ -284,108 +252,84 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
             ),
 
             const SizedBox(height: 30),
+
             SizedBox(
               width: double.infinity,
-              height: 52,
-              child: ElevatedButton.icon(
-                icon: saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                    : const Icon(Icons.save),
-
-                label: Text(
-                  widget.dispatch == null ? "SAVE DISPATCH" : "UPDATE DISPATCH",
-                ),
-
+              height: 50,
+              child: ElevatedButton(
                 onPressed: saving
                     ? null
                     : () async {
-                        if (!_formKey.currentState!.validate()) {
-                          return;
-                        }
 
-                        if (selectedShipment == null ||
-                            selectedVehicle == null ||
-                            selectedDriver == null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text("Please complete all fields."),
-                            ),
-                          );
+                  if (selectedShipment == null ||
+                      selectedVehicle == null ||
+                      selectedDriver == null) {
 
-                          return;
-                        }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Please select Shipment, Vehicle and Driver.",
+                        ),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
 
-                        setState(() {
-                          saving = true;
-                        });
+                    return;
+                  }
 
-                        try {
-                          final dispatch = Dispatch(
-                            id: widget.dispatch?.id ?? 0,
+                  setState(() {
+                    saving = true;
+                  });
 
-                            dispatchNumber:
-                                widget.dispatch?.dispatchNumber ?? "",
+                  try {
 
-                            shipmentId: selectedShipment!.id,
-                            shipmentNumber: selectedShipment!.shipmentNumber,
+                    final request = CreateDispatchRequest(
+                      shipmentId: selectedShipment!.id,
+                      vehicleId: selectedVehicle!.id,
+                      driverId: selectedDriver!.id,
+                      dispatchDate: selectedDate,
+                      notes: notesController.text,
+                    );
 
-                            vehicleId: selectedVehicle!.id,
-                            vehiclePlate: selectedVehicle!.plateNumber,
+                    await dispatchService.createDispatch(request);
 
-                            driverId: selectedDriver!.id,
-                            driverName: selectedDriver!.fullName,
+                    if (!mounted) return;
 
-                            dispatchDate: dispatchDate,
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          "Dispatch created successfully.",
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
 
-                            status: status,
+                    Navigator.pop(context, true);
 
-                            notes: notesController.text.trim(),
-                          );
+                  } catch (e) {
 
-                          if (widget.dispatch == null) {
-                            await _dispatchService.createDispatch(dispatch);
-                          } else {
-                            await _dispatchService.updateDispatch(dispatch);
-                          }
+                    if (!mounted) return;
 
-                          if (!mounted) return;
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(e.toString()),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.green,
-                              content: Text(
-                                widget.dispatch == null
-                                    ? "Dispatch created successfully."
-                                    : "Dispatch updated successfully.",
-                              ),
-                            ),
-                          );
+                  } finally {
 
-                          Navigator.pop(context, true);
-                        } catch (e) {
-                          if (!mounted) return;
+                    if (mounted) {
+                      setState(() {
+                        saving = false;
+                      });
+                    }
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: Colors.red,
-                              content: Text(e.toString()),
-                            ),
-                          );
-                        } finally {
-                          if (mounted) {
-                            setState(() {
-                              saving = false;
-                            });
-                          }
-                        }
-                      },
+                  }
+                },
+                child: const Text(
+                  "CREATE DISPATCH",
+                ),
               ),
             ),
           ],

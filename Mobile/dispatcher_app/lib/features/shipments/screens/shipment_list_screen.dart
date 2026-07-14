@@ -174,10 +174,12 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
                     .length;
 
                 if (shipments.isEmpty) {
-                  return const AppEmptyState(
-                    icon: Icons.search_off,
-                    title: "No Results",
-                    subtitle: "No shipment matches your search.",
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        "No pending shipments available. Create a new shipment first.",
+                      ),
+                    ),
                   );
                 }
 
