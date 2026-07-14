@@ -1,19 +1,17 @@
-import '../../../core/api/api_client.dart';
-import '../../../core/api/api_endpoints.dart';
+import '../core/api/api_client.dart';
+import '../core/api/api_endpoints.dart';
 
-import '../models/trip.dart';
+import '../features/trips/models/trip.dart';
 
 class TripService {
   Future<List<Trip>> getTrips() async {
-    print("Calling: ${ApiEndpoints.trips}");
-
     final response = await ApiClient.dio.get(
       ApiEndpoints.trips,
     );
 
-    print(response.statusCode);
+    final List<dynamic> data = response.data["data"];
 
-    return (response.data as List)
+    return data
         .map((e) => Trip.fromJson(e))
         .toList();
   }
@@ -23,7 +21,7 @@ class TripService {
       "${ApiEndpoints.trips}/$id",
     );
 
-    return Trip.fromJson(response.data);
+    return Trip.fromJson(response.data["data"]);
   }
 
   Future<void> startTrip(int id) async {

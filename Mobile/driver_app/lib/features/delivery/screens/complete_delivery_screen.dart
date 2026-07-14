@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../../trips/models/driver_trip.dart';
 import '../models/complete_delivery_request.dart';
@@ -8,14 +11,10 @@ import '../services/delivery_service.dart';
 class CompleteDeliveryScreen extends StatefulWidget {
   final DriverTrip trip;
 
-  const CompleteDeliveryScreen({
-    super.key,
-    required this.trip,
-  });
+  const CompleteDeliveryScreen({super.key, required this.trip});
 
   @override
-  State<CompleteDeliveryScreen> createState() =>
-      _CompleteDeliveryScreenState();
+  State<CompleteDeliveryScreen> createState() => _CompleteDeliveryScreenState();
 }
 
 class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
@@ -27,6 +26,10 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
 
   final DeliveryService _service = DeliveryService();
 
+  final ImagePicker _picker = ImagePicker();
+
+  File? _photo;
+
   bool _saving = false;
 
   @override
@@ -37,8 +40,31 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
     super.dispose();
   }
 
+  Future<void> _takePhoto() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.camera,
+      imageQuality: 80,
+    );
+
+    if (image == null) return;
+
+    setState(() {
+      _photo = File(image.path);
+    });
+  }
+
   Future<void> _completeDelivery() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_photo == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Please take a delivery photo."),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _saving = true;
@@ -59,18 +85,21 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
         signaturePath: "",
       );
 
+      print("================================");
+      print("Trip ID sent: ${widget.trip.id}");
+      print("Trip Number: ${widget.trip.tripNumber}");
+      print("================================");
+
       final message = await _service.completeDelivery(
         widget.trip.id,
         request,
+        _photo,
       );
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          backgroundColor: Colors.green,
-        ),
+        SnackBar(content: Text(message), backgroundColor: Colors.green),
       );
 
       Navigator.pop(context, true);
@@ -78,10 +107,7 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(e.toString()),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
       );
     } finally {
       if (mounted) {
@@ -92,12 +118,28 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
     }
   }
 
+  Widget _infoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 2,
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(flex: 3, child: Text(value)),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Complete Delivery"),
-      ),
+      appBar: AppBar(title: const Text("Complete Delivery")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Form(
@@ -121,6 +163,34 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
               ),
 
               const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton.icon(
+                  onPressed: _takePhoto,
+                  icon: const Icon(Icons.camera_alt),
+                  label: const Text(
+                    "TAKE DELIVERY PHOTO",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 15),
+
+              if (_photo != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    _photo!,
+                    width: double.infinity,
+                    height: 220,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+              if (_photo != null) const SizedBox(height: 20),
 
               TextFormField(
                 controller: _receiverController,
@@ -161,7 +231,7 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
                 ),
               ),
 
-              const SizedBox(height: 25),
+              const SizedBox(height: 30),
 
               SizedBox(
                 width: double.infinity,
@@ -170,18 +240,16 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
                   onPressed: _saving ? null : _completeDelivery,
                   icon: _saving
                       ? const SizedBox(
-                    width: 22,
-                    height: 22,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
                       : const Icon(Icons.check_circle),
                   label: Text(
-                    _saving
-                        ? "Submitting..."
-                        : "COMPLETE DELIVERY",
+                    _saving ? "Submitting..." : "COMPLETE DELIVERY",
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -192,29 +260,6 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _infoRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(value),
-          ),
-        ],
       ),
     );
   }

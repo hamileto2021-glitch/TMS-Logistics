@@ -27,11 +27,6 @@ class _AuthInterceptor extends Interceptor {
 
   @override
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    // Skip token attachment for login endpoint
-    if (options.path.contains('/Auth/login')) {
-      return handler.next(options);
-    }
-
     try {
       final token = await _tokenStorage.getToken();
       

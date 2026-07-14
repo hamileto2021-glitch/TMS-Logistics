@@ -36,18 +36,22 @@ class AuthService {
       print("✅ Login response received");
 
       final loginResponse = LoginResponse.fromJson(response.data);
-      if (loginResponse.token.isNotEmpty) {
-        print("Token received: ${loginResponse.token.substring(0, loginResponse.token.length > 30 ? 30 : loginResponse.token.length)}...");
-      } else {
-        print("⚠️ Warning: Received empty token");
+      if (loginResponse.token.isEmpty) {
+        print("❌ Login response did not include a usable token");
+        throw Exception("Login response did not include a token");
       }
+
+      print("Token from response: ${loginResponse.token.substring(0, 30)}...");
 
       print("\n💾 Saving token to storage...");
       await _storage.saveToken(loginResponse.token);
       
+      // Wait a moment for storage to persist
+      await Future.delayed(const Duration(milliseconds: 500));
+      
       // Verify token was saved
       final verifyToken = await _storage.getToken();
-      if (verifyToken == null || verifyToken.isEmpty) {
+      if (verifyToken == null) {
         print("❌ Token verification failed - token not in storage after save!");
         throw Exception("Failed to save token");
       }

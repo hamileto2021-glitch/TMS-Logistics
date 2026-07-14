@@ -4,7 +4,7 @@ import '../../../core/widgets/feedback/app_loading.dart';
 import '../../../core/widgets/feedback/app_empty_state.dart';
 
 import '../models/trip.dart';
-import '../services/trip_service.dart';
+import '../../../services/trip_service.dart';
 
 import '../widgets/trip_card.dart';
 import '../widgets/trip_statistics.dart';

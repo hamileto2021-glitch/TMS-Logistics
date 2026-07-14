@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/trip.dart';
-import '../services/trip_service.dart';
+import '../../../services/trip_service.dart';
 
 import '../widgets/trip_status_chip.dart';
 import '../widgets/trip_header_card.dart';
@@ -9,6 +9,7 @@ import '../widgets/trip_section_card.dart';
 import '../widgets/trip_detail_row.dart';
 import '../widgets/trip_metrics_card.dart';
 import '../widgets/trip_timeline_card.dart';
+import '../../delivery/screens/delivery_details_screen.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -269,6 +270,30 @@ class _TripDetailsScreenState
                           Navigator.pop(context);
                         }
                       }
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.verified),
+                    label: const Text(
+                      "VIEW PROOF OF DELIVERY",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => DeliveryDetailsScreen(
+                            tripId: trip.id,
+                          ),
+                        ),
+                      );
                     },
                   ),
                 ),

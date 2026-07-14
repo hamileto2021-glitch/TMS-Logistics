@@ -8,13 +8,24 @@ class DriverService {
   // GET ALL DRIVERS
   // ===========================
   Future<List<Driver>> getDrivers() async {
-    final response = await ApiClient.dio.get(
-      ApiEndpoints.drivers,
-    );
+    final response = await ApiClient.dio.get(ApiEndpoints.drivers);
 
-    final List data = response.data;
+    print("========== DRIVER API ==========");
+    print("Status: ${response.statusCode}");
+    print("RuntimeType: ${response.data.runtimeType}");
+    print(response.data);
+    print("================================");
 
-    return data.map((e) => Driver.fromJson(e)).toList();
+    if (response.statusCode != 200) {
+      throw Exception("HTTP ${response.statusCode}: ${response.data}");
+    }
+
+    final List<dynamic> data = response.data["data"];
+
+    return data.map((e) {
+      print("Driver JSON: $e");
+      return Driver.fromJson(e);
+    }).toList();
   }
 
   // ===========================
@@ -25,7 +36,7 @@ class DriverService {
       "${ApiEndpoints.drivers}/$id",
     );
 
-    return Driver.fromJson(response.data);
+    return Driver.fromJson(response.data["data"]);
   }
 
   // ===========================

@@ -1,19 +1,21 @@
 class ApiEndpoints {
-  // Your ASP.NET Core Backend
   static const String baseUrl = "http://10.79.99.92:5085/api";
 
-  // Authentication
-  static const String login = "$baseUrl/Auth/login";
+  static const String login = "/Auth/login";
 
-  // Dashboard
-  static const String dashboard = "$baseUrl/Dashboard";
+  static const String dashboard = "/Dashboard";
 
-  // Modules
-  static const String customers = "$baseUrl/Customers";
-  static const String shipments = "$baseUrl/Shipments";
-  static const String dispatches = "$baseUrl/Dispatches";
-  static const String trips = "$baseUrl/Trips";
-  static const String vehicles = "$baseUrl/Vehicles";
-  static const String drivers = "$baseUrl/Drivers";
-  static const tracking = "$baseUrl/Tracking";
+  static const String customers = "/Customers";
+
+  static const String shipments = "/Shipments";
+
+  static const String dispatches = "/Dispatches";
+
+  static const String trips = "/Trips";
+
+  static const String vehicles = "/Vehicles";
+
+  static const String drivers = "/Drivers";
+
+  static const String tracking = "/Tracking";
 }

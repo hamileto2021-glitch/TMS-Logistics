@@ -40,7 +40,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
             .read<TripTrackingManager>()
             .startTracking(trip.id);
         setState(() {
-          trip.status = "Started";
+          trip.status = "In Progress";
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -120,7 +120,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 icon: Icon(
                   trip.status == "Scheduled"
                       ? Icons.play_arrow
-                      : trip.status == "Started"
+                      : trip.status == "In Progress"
                       ? Icons.check_circle
                       : Icons.check_circle,
                 ),
@@ -138,7 +138,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 onPressed: () async {
                   if (trip.status == "Scheduled") {
                     await _startTrip();
-                  } else if (trip.status == "Started") {
+                  } else if (trip.status == "In Progress") {
+                    print("Trip ID: ${trip.id}");
+                    print("Trip Number: ${trip.tripNumber}");
+
                     final result = await Navigator.push(
                       context,
                       MaterialPageRoute(

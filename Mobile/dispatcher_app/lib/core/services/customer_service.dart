@@ -47,9 +47,11 @@ Future<void> updateCustomer(Customer customer) async {
       ),
     );
 
-    final List data = response.data;
+    final List<dynamic> data = response.data["data"];
 
-    return data.map((e) => Customer.fromJson(e)).toList();
+    return data
+        .map((e) => Customer.fromJson(e))
+        .toList();
   }
 
   Future<Customer> getCustomer(int id) async {
@@ -64,7 +66,7 @@ Future<void> updateCustomer(Customer customer) async {
       ),
     );
 
-    return Customer.fromJson(response.data);
+    return Customer.fromJson(response.data["data"]);
   }
 
   Future<void> deleteCustomer(int id) async {
