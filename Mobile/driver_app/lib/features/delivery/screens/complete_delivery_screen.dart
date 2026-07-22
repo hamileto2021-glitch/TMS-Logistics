@@ -3,15 +3,21 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
-
-import '../../trips/models/driver_trip.dart';
+import '../../trips/models/active_trip.dart';
 import '../models/complete_delivery_request.dart';
 import '../services/delivery_service.dart';
+import 'package:signature/signature.dart';
+import 'dart:typed_data';
+import 'package:path_provider/path_provider.dart';
+import '../../trips/models/driver_trip.dart';
 
 class CompleteDeliveryScreen extends StatefulWidget {
   final DriverTrip trip;
 
-  const CompleteDeliveryScreen({super.key, required this.trip});
+  const CompleteDeliveryScreen({
+    super.key,
+    required this.trip,
+  });
 
   @override
   State<CompleteDeliveryScreen> createState() => _CompleteDeliveryScreenState();
@@ -23,6 +29,9 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
   final _receiverController = TextEditingController();
   final _phoneController = TextEditingController();
   final _notesController = TextEditingController();
+  final SignatureController _signatureController = SignatureController(
+    penStrokeWidth: 3,
+  );
 
   final DeliveryService _service = DeliveryService();
 
@@ -37,6 +46,9 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
     _receiverController.dispose();
     _phoneController.dispose();
     _notesController.dispose();
+
+    _signatureController.dispose();
+
     super.dispose();
   }
 
@@ -66,14 +78,55 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
       return;
     }
 
+    if (_signatureController.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Customer signature is required."),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
     setState(() {
       _saving = true;
     });
 
     try {
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied) {
+        throw Exception("Location permission denied.");
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception(
+          "Location permission permanently denied. Please enable it in Settings.",
+        );
+      }
+
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
+      final Uint8List? signatureBytes =
+      await _signatureController.toPngBytes();
+
+      if (signatureBytes == null) {
+        throw Exception("Unable to capture customer signature.");
+      }
+
+      final tempDir = await getTemporaryDirectory();
+
+      final signatureFile = File(
+        "${tempDir.path}/signature_${widget.trip.id}.png",
+      );
+
+      await signatureFile.writeAsBytes(signatureBytes);
 
       final request = CompleteDeliveryRequest(
         receiverName: _receiverController.text.trim(),
@@ -94,6 +147,7 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
         widget.trip.id,
         request,
         _photo,
+        signatureFile,
       );
 
       if (!mounted) return;
@@ -190,7 +244,45 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
                   ),
                 ),
 
-              if (_photo != null) const SizedBox(height: 20),
+              if (_photo != null)
+                const SizedBox(height: 20),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Customer Signature",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Container(
+                height: 220,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Signature(
+                  controller: _signatureController,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+
+              const SizedBox(height: 10),
+
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () {
+                    _signatureController.clear();
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text("Clear Signature"),
+                ),
+              ),
 
               TextFormField(
                 controller: _receiverController,

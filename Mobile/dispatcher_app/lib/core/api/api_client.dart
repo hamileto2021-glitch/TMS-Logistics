@@ -26,10 +26,12 @@ class _AuthInterceptor extends Interceptor {
   _AuthInterceptor(this._tokenStorage);
 
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  Future<void> onRequest(
+      RequestOptions options,
+      RequestInterceptorHandler handler) async {
     try {
       final token = await _tokenStorage.getToken();
-      
+
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';
         print("[AUTH] ✅ Token attached: ${token.substring(0, 20)}...");
@@ -39,7 +41,10 @@ class _AuthInterceptor extends Interceptor {
     } catch (e) {
       print("[AUTH] ❌ Error retrieving token: $e");
     }
-    
+
+    // 👇 Add this line
+    print("[REQUEST] ${options.method} ${options.uri}");
+
     return handler.next(options);
   }
 }
@@ -61,5 +66,6 @@ class _ErrorInterceptor extends Interceptor {
     print("[ERROR] Message: ${err.message}");
     print("[ERROR] Status: ${err.response?.statusCode}");
     handler.next(err);
+
   }
 }

@@ -63,7 +63,7 @@ class _LiveFleetScreenState extends State<LiveFleetScreen> {
 
     switch(status){
 
-      case "Started":
+      case "In Progress":
         return Colors.green;
 
       case "Scheduled":

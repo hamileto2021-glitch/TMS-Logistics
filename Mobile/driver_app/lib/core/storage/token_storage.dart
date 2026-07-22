@@ -1,97 +1,69 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TokenStorage {
-  TokenStorage();
+  static const _tokenKey = "jwt_token";
+  static const _nameKey = "driver_name";
+  static const _emailKey = "driver_email";
+  static const _roleKey = "driver_role";
+  static const _driverIdKey = "driver_id";
+  static const _vehicleIdKey = "vehicle_id";
 
-  final FlutterSecureStorage _storage = const FlutterSecureStorage();
-
-  // Storage Keys
-  static const String _tokenKey = "jwt_token";
-  static const String _nameKey = "driver_name";
-  static const String _driverIdKey = "driver_id";
-  static const String _vehicleIdKey = "vehicle_id";
-  static const String _roleKey = "role";
-  static const String _emailKey = "email";
-
-  /// Save only JWT token
-  Future<void> saveToken(String token) async {
-    await _storage.write(
-      key: _tokenKey,
-      value: token,
-    );
-  }
-
-  /// Save logged-in user information
   Future<void> saveUser({
     required String token,
     required String name,
     required String email,
     required String role,
-    required int? driverId,
-    required int? vehicleId,
+    int? driverId,
+    int? vehicleId,
   }) async {
-    await _storage.write(key: _tokenKey, value: token);
-    await _storage.write(key: _nameKey, value: name);
-    await _storage.write(key: _emailKey, value: email);
-    await _storage.write(key: _roleKey, value: role);
+    final prefs = await SharedPreferences.getInstance();
 
-    await _storage.write(
-      key: _driverIdKey,
-      value: (driverId ?? 0).toString(),
-    );
+    await prefs.setString(_tokenKey, token);
+    await prefs.setString(_nameKey, name);
+    await prefs.setString(_emailKey, email);
+    await prefs.setString(_roleKey, role);
 
-    await _storage.write(
-      key: _vehicleIdKey,
-      value: (vehicleId ?? 0).toString(),
-    );
+    if (driverId != null) {
+      await prefs.setInt(_driverIdKey, driverId);
+    }
+
+    if (vehicleId != null) {
+      await prefs.setInt(_vehicleIdKey, vehicleId);
+    }
   }
 
-  /// Read values
   Future<String?> getToken() async {
-    return await _storage.read(key: _tokenKey);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_tokenKey);
   }
 
   Future<String?> getDriverName() async {
-    return await _storage.read(key: _nameKey);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_nameKey);
   }
 
   Future<String?> getEmail() async {
-    return await _storage.read(key: _emailKey);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_emailKey);
   }
 
   Future<String?> getRole() async {
-    return await _storage.read(key: _roleKey);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString(_roleKey);
   }
 
   Future<int?> getDriverId() async {
-    final value = await _storage.read(key: _driverIdKey);
-
-    if (value == null) return null;
-
-    return int.tryParse(value);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_driverIdKey);
   }
 
   Future<int?> getVehicleId() async {
-    final value = await _storage.read(key: _vehicleIdKey);
-
-    if (value == null) return null;
-
-    return int.tryParse(value);
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_vehicleIdKey);
   }
 
-  /// Generic read method
-  Future<String?> read(String key) async {
-    return await _storage.read(key: key);
-  }
-
-  /// Check login status
-  Future<bool> isLoggedIn() async {
-    final token = await getToken();
-    return token != null && token.isNotEmpty;
-  }
-
-  /// Logout
   Future<void> clear() async {
-    await _storage.deleteAll();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
   }
 }

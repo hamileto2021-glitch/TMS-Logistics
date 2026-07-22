@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:geolocator/geolocator.dart';
 
 import '../../../core/services/location_service.dart';
-import 'services/tracking_service.dart';
+import '../../../models/location_update.dart';
+import 'tracking_service.dart';
 
 class TripTrackingManager {
   final LocationService _locationService = LocationService();
@@ -25,10 +26,16 @@ class TripTrackingManager {
     _subscription = _locationService
         .getLocationStream()
         .listen((position) async {
-      await _trackingService.sendLocation(
-        tripId,
-        position,
+
+      final location = LocationUpdate(
+        tripId: tripId,
+        latitude: position.latitude,
+        longitude: position.longitude,
+        speed: position.speed,
+        heading: position.heading,
       );
+
+      await _trackingService.sendLocation(location);
     });
   }
 

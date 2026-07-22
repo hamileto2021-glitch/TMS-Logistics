@@ -60,6 +60,12 @@ dependencies:
   image_picker: ^1.1.2
 
 
+
+  signalr_netcore: ^1.4.4
+  signature: ^5.5.0
+
+
+
   # Date & Time
   intl: ^0.20.2
 
@@ -71,3 +77,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/

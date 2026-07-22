@@ -14,6 +14,7 @@ class DeliveryService {
       int tripId,
       CompleteDeliveryRequest request,
       File? photo,
+      File? signature,
       ) async {
     final token = await _storage.getToken();
 
@@ -49,6 +50,14 @@ class DeliveryService {
         await http.MultipartFile.fromPath(
           "Photo",
           photo.path,
+        ),
+      );
+    }
+    if (signature != null) {
+      multipartRequest.files.add(
+        await http.MultipartFile.fromPath(
+          "Signature",
+          signature.path,
         ),
       );
     }

@@ -1,39 +1,25 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 
-import 'package:http/http.dart' as http;
-import 'package:geolocator/geolocator.dart';
+import '../../../core/api/api_client.dart';
+import '../../../models/location_update.dart';
+import '../models/current_location.dart';
 
-import '../../../core/constants/api_constants.dart';
-import '../../../core/storage/token_storage.dart';
 
 class TrackingService {
-  final TokenStorage _storage = TokenStorage();
+  final Dio _dio = ApiClient.dio;
 
-  Future<void> sendLocation(
-      int tripId,
-      Position position,
-      ) async {
-
-    final token = await _storage.getToken();
-
-    final response = await http.post(
-      Uri.parse("${ApiConstants.baseUrl}/Tracking/location"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-      body: jsonEncode({
-        "tripId": tripId,
-        "latitude": position.latitude,
-        "longitude": position.longitude,
-        "speed": position.speed,
-        "heading": position.heading,
-      }),
+  Future<void> sendLocation(LocationUpdate location) async {
+    await _dio.post(
+      "/tracking/location",
+      data: location.toJson(),
     );
-    if (response.statusCode != 200) {
-      throw Exception(
-        "Unable to send location: ${response.body}",
-      );
-    }
+  }
+
+  Future<CurrentLocation> getCurrentLocation(int tripId) async {
+    final response = await _dio.get(
+      "/tracking/current/$tripId",
+    );
+
+    return CurrentLocation.fromJson(response.data);
   }
 }

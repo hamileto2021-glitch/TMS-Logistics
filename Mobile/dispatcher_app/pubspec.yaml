@@ -15,6 +15,7 @@ dependencies:
 
 
   google_maps_flutter: ^2.12.3
+  flutter_polyline_points: ^2.1.0
   geolocator: ^14.0.2
   permission_handler: ^12.0.1
   http: ^1.2.1
@@ -42,3 +43,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/images/truck.png

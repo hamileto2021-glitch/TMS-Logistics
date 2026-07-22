@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../tracking/trip_tracking_manager.dart';
+import '../../tracking/services/trip_tracking_manager.dart';
 
 import '../models/driver_trip.dart';
 import '../services/trip_service.dart';
@@ -127,7 +127,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                 label: Text(
                   trip.status == "Scheduled"
                       ? "START TRIP"
-                      : trip.status == "Started"
+                      : trip.status == "In Progress"
                       ? "COMPLETE DELIVERY"
                       : "VIEW SUMMARY",
                   style: const TextStyle(
