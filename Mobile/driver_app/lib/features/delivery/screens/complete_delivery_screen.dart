@@ -39,6 +39,9 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
 
   File? _photo;
 
+  double? _latitude;
+  double? _longitude;
+
   bool _saving = false;
 
   @override
@@ -112,6 +115,11 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
+
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+      });
 
       final Uint8List? signatureBytes =
       await _signatureController.toPngBytes();
@@ -324,6 +332,19 @@ class _CompleteDeliveryScreenState extends State<CompleteDeliveryScreen> {
               ),
 
               const SizedBox(height: 30),
+
+              if (_latitude != null && _longitude != null)
+                Card(
+                  child: ListTile(
+                    leading: const Icon(Icons.location_on),
+                    title: const Text("Delivery Location"),
+                    subtitle: Text(
+                      "${_latitude!.toStringAsFixed(6)}, ${_longitude!.toStringAsFixed(6)}",
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 20),
 
               SizedBox(
                 width: double.infinity,

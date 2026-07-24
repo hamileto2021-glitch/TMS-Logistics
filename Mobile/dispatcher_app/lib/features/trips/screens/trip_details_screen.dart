@@ -41,6 +41,8 @@ class _TripDetailsScreenState
     setState(() {
       _future = _service.getTrip(widget.tripId);
     });
+
+    await _future;
   }
 
   @override
@@ -78,24 +80,23 @@ class _TripDetailsScreenState
 
           final trip = snapshot.data!;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+          return RefreshIndicator(
+              onRefresh: _reload,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: TripStatusChip(
+                        status: trip.status,
+                      ),
+                    ),
 
-            child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+                    const SizedBox(height: 20),
 
-              children: [
-
-                Center(
-                  child: TripStatusChip(
-                    status: trip.status,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                TripHeaderCard(trip: trip),
+                    TripHeaderCard(trip: trip),
 
                 const SizedBox(height: 16),
 
@@ -299,7 +300,8 @@ class _TripDetailsScreenState
                 ),
 
               ],
-            ),
+                ),
+                ),
           );
         },
       ),

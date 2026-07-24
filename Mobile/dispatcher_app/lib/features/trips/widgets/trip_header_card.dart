@@ -10,6 +10,7 @@ class TripHeaderCard extends StatelessWidget {
     required this.trip,
   });
 
+
   @override
   Widget build(BuildContext context) {
     return Card(

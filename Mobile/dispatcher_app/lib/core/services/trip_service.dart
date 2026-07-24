@@ -2,6 +2,7 @@ import '../api/api_client.dart';
 import '../api/api_endpoints.dart';
 
 import '../../models/trip.dart';
+import '../../models/create_trip_request.dart';
 
 class TripService {
   Future<List<Trip>> getTrips() async {
@@ -22,6 +23,20 @@ class TripService {
     );
 
     return Trip.fromJson(response.data["data"]);
+  }
+
+  Future<void> createTrip(
+      CreateTripRequest request,
+      ) async {
+    final response = await ApiClient.dio.post(
+      ApiEndpoints.trips,
+      data: request.toJson(),
+    );
+
+    print("========== CREATE TRIP ==========");
+    print("Status: ${response.statusCode}");
+    print(response.data);
+    print("=================================");
   }
 
   Future<void> startTrip(int id) async {

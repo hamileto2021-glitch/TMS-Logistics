@@ -18,6 +18,10 @@ import '../services/dashboard_service.dart';
 import '../../fleet/screens/live_fleet_screen.dart';
 import '../../../core/widgets/app_drawer.dart';
 import '../widgets/dashboard_live_map.dart';
+import '../../customers/screens/customer_form_screen.dart';
+import '../../shipments/screens/shipment_form_screen.dart';
+import '../../dispatches/screens/dispatch_form_screen.dart';
+import '../../trips/screens/trip_form_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -78,8 +82,11 @@ final dashboard = snapshot.data!;
 return ListView(
           children: [
 
-            const DashboardHeader(
+            DashboardHeader(
               userName: "Mohammed",
+              onMenuPressed: () {
+                Scaffold.of(context).openDrawer();
+              },
             ),
 
             DashboardStatistics(
@@ -150,23 +157,39 @@ drivers: dashboard.drivers,
 
             DashboardQuickActions(
               onAddCustomer: () {
-                // TODO:
-                // Navigate to CustomerFormScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const CustomerFormScreen(),
+                  ),
+                );
               },
 
               onAddShipment: () {
-                // TODO:
-                // Navigate to ShipmentFormScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ShipmentFormScreen(),
+                  ),
+                );
               },
 
               onAddDispatch: () {
-                // TODO:
-                // Navigate to DispatchFormScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const DispatchFormScreen(),
+                  ),
+                );
               },
 
               onAddTrip: () {
-                // TODO:
-                // Navigate to TripFormScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const TripFormScreen(),
+                  ),
+                );
               },
 
               onLiveTracking: () {

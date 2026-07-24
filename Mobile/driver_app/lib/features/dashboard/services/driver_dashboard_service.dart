@@ -9,6 +9,9 @@ class DriverDashboardService {
   Future<DriverDashboard> loadDashboard() async {
     final token = await _storage.getToken();
 
+    print("Loading dashboard...");
+    print("Token: ${token != null}");
+
     final response = await ApiClient.dio.get(
       "/driver/dashboard",
       options: Options(
@@ -17,6 +20,9 @@ class DriverDashboardService {
         },
       ),
     );
+
+    print("Status: ${response.statusCode}");
+    print("Data: ${response.data}");
 
     return DriverDashboard.fromJson(response.data);
   }

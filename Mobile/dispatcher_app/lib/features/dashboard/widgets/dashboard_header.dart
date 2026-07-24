@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../notifications/screens/notifications_screen.dart';
+import '../../notifications/widgets/notification_badge.dart';
+
+
 
 class DashboardHeader extends StatelessWidget {
   final String userName;
+  final VoidCallback onMenuPressed;
 
   const DashboardHeader({
     super.key,
     required this.userName,
+    required this.onMenuPressed,
   });
 
   @override
@@ -27,6 +33,18 @@ class DashboardHeader extends StatelessWidget {
         children: [
           Row(
             children: [
+              IconButton(
+                onPressed: () {
+                  Scaffold.of(context).openDrawer();
+                },
+                icon: const Icon(
+                  Icons.menu,
+                  color: Colors.white,
+                ),
+              ),
+
+              const SizedBox(width: 8),
+
               const CircleAvatar(
                 radius: 28,
                 backgroundColor: Colors.white,
@@ -63,12 +81,16 @@ class DashboardHeader extends StatelessWidget {
                 ),
               ),
 
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.notifications,
-                  color: Colors.white,
-                ),
+              NotificationBadge(
+                count: 2,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const NotificationsScreen(),
+                    ),
+                  );
+                },
               ),
             ],
           ),

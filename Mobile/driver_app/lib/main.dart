@@ -7,6 +7,7 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/login_screen.dart';
 import 'features/trips/providers/trip_provider.dart';
 import 'features/tracking/providers/tracking_provider.dart';
+import 'features/dashboard/providers/driver_dashboard_provider.dart';
 
 void main() {
   runApp(
@@ -23,10 +24,14 @@ void main() {
           ChangeNotifierProvider(
             create: (_) => TrackingProvider(),
           ),
+
+          ChangeNotifierProvider(
+            create: (_) => DriverDashboardProvider(),
+          ),
         ],
 
-      child: const DriverApp(),
-    ),
+        child: const DriverApp(),
+      )
   );
 }
 

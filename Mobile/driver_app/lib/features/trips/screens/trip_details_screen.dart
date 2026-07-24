@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:convert';
 import '../../tracking/services/trip_tracking_manager.dart';
 
 import '../models/driver_trip.dart';
@@ -8,6 +10,8 @@ import '../../delivery/screens/complete_delivery_screen.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final DriverTrip trip;
+
+
 
   const TripDetailsScreen({
     super.key,
@@ -21,6 +25,8 @@ class TripDetailsScreen extends StatefulWidget {
 class _TripDetailsScreenState extends State<TripDetailsScreen> {
   late DriverTrip trip;
 
+  bool _starting = false;
+
   @override
   void initState() {
     super.initState();
@@ -29,6 +35,10 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
 
   Future<void> _startTrip() async {
     final service = TripService();
+
+    setState(() {
+      _starting = true;
+    });
 
     try {
       final success = await service.startTrip(trip.id);
@@ -39,6 +49,7 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         await context
             .read<TripTrackingManager>()
             .startTracking(trip.id);
+
         setState(() {
           trip.status = "In Progress";
         });
@@ -57,6 +68,35 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
         SnackBar(
           content: Text(e.toString()),
           backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _starting = false;
+        });
+      }
+    }
+  }
+  Future<void> _navigateToDestination() async {
+    final destination = Uri.encodeComponent(trip.destination);
+
+    final googleMapsUrl =
+        "https://www.google.com/maps/dir/?api=1&destination=$destination&travelmode=driving";
+
+    final uri = Uri.parse(googleMapsUrl);
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(
+        uri,
+        mode: LaunchMode.externalApplication,
+      );
+    } else {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Unable to open Google Maps."),
         ),
       );
     }
@@ -106,6 +146,8 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     buildRow("Origin", trip.origin),
                     buildRow("Destination", trip.destination),
                     buildRow("Status", trip.status),
+                    buildRow("Driver", trip.driver),
+                    buildRow("Vehicle", trip.vehicle),
                   ],
                 ),
               ),
@@ -135,7 +177,9 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                onPressed: () async {
+                onPressed: _starting
+                    ? null
+                    : () async {
                   if (trip.status == "Scheduled") {
                     await _startTrip();
                   } else if (trip.status == "In Progress") {
@@ -164,6 +208,22 @@ class _TripDetailsScreenState extends State<TripDetailsScreen> {
                     );
                   }
                 },
+              ),
+            ),const SizedBox(height: 15),
+
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: OutlinedButton.icon(
+                icon: const Icon(Icons.navigation),
+                label: const Text(
+                  "NAVIGATE",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: _navigateToDestination,
               ),
             ),
           ],

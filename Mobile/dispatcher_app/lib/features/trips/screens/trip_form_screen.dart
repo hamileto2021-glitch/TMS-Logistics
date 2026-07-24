@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/services/dispatch_service.dart';
+import '../../../core/services/trip_service.dart';
+
+import '../../../models/dispatch.dart';
+import '../../../models/create_trip_request.dart';
+
 class TripFormScreen extends StatefulWidget {
   const TripFormScreen({super.key});
 
@@ -10,19 +16,57 @@ class TripFormScreen extends StatefulWidget {
 class _TripFormScreenState extends State<TripFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController shipmentController =
-  TextEditingController();
-
-  final TextEditingController vehicleController =
-  TextEditingController();
-
-  final TextEditingController driverController =
-  TextEditingController();
+  final DispatchService dispatchService = DispatchService();
+  final TripService tripService = TripService();
 
   final TextEditingController remarksController =
   TextEditingController();
 
+  List<Dispatch> dispatches = [];
+
+  Dispatch? selectedDispatch;
+
+  bool loading = true;
   bool isSaving = false;
+
+  DateTime plannedStartTime = DateTime.now();
+
+  @override
+  void initState() {
+    super.initState();
+    loadDispatches();
+  }
+
+  Future<void> loadDispatches() async {
+    try {
+      dispatches = await dispatchService.getDispatches();
+
+      dispatches = dispatches
+          .where((e) => e.status == "Scheduled")
+          .toList();
+    } finally {
+      if (mounted) {
+        setState(() {
+          loading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> pickDate() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: plannedStartTime,
+      firstDate: DateTime(2024),
+      lastDate: DateTime(2100),
+    );
+
+    if (date != null) {
+      setState(() {
+        plannedStartTime = date;
+      });
+    }
+  }
 
   Future<void> saveTrip() async {
     if (!_formKey.currentState!.validate()) return;
@@ -31,20 +75,45 @@ class _TripFormScreenState extends State<TripFormScreen> {
       isSaving = true;
     });
 
-    // TODO:
-    // Call TripService.createTrip()
+    try {
+      final request = CreateTripRequest(
+        dispatchId: selectedDispatch!.id,
+        plannedStartTime: plannedStartTime,
+        remarks: remarksController.text,
+      );
 
-    await Future.delayed(const Duration(seconds: 1));
+      await tripService.createTrip(request);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Trip created successfully"),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Trip created successfully"),
+        ),
+      );
 
-    Navigator.pop(context);
+      Navigator.pop(context, true);
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString()),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          isSaving = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    remarksController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,56 +122,56 @@ class _TripFormScreenState extends State<TripFormScreen> {
       appBar: AppBar(
         title: const Text("Create Trip"),
       ),
-      body: Form(
+      body: loading
+          ? const Center(
+        child: CircularProgressIndicator(),
+      )
+          : Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-
-            TextFormField(
-              controller: shipmentController,
+            DropdownButtonFormField<Dispatch>(
+              value: selectedDispatch,
               decoration: const InputDecoration(
-                labelText: "Shipment ID",
+                labelText: "Dispatch",
                 border: OutlineInputBorder(),
               ),
+              items: dispatches.map((dispatch) {
+                return DropdownMenuItem(
+                  value: dispatch,
+                  child: Text(
+                    "${dispatch.dispatchNumber} | "
+                        "${dispatch.shipmentNumber}",
+                  ),
+                );
+              }).toList(),
               validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Shipment is required";
+                if (value == null) {
+                  return "Please select a dispatch";
                 }
                 return null;
+              },
+              onChanged: (value) {
+                setState(() {
+                  selectedDispatch = value;
+                });
               },
             ),
 
             const SizedBox(height: 16),
 
-            TextFormField(
-              controller: vehicleController,
-              decoration: const InputDecoration(
-                labelText: "Vehicle ID",
-                border: OutlineInputBorder(),
+            ListTile(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+                side: const BorderSide(color: Colors.grey),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Vehicle is required";
-                }
-                return null;
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            TextFormField(
-              controller: driverController,
-              decoration: const InputDecoration(
-                labelText: "Driver ID",
-                border: OutlineInputBorder(),
+              leading: const Icon(Icons.calendar_today),
+              title: const Text("Planned Start Date"),
+              subtitle: Text(
+                "${plannedStartTime.day}/${plannedStartTime.month}/${plannedStartTime.year}",
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return "Driver is required";
-                }
-                return null;
-              },
+              onTap: pickDate,
             ),
 
             const SizedBox(height: 16),
@@ -116,7 +185,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
               maxLines: 3,
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 24),
 
             SizedBox(
               height: 50,
@@ -132,9 +201,12 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 )
                     : const Icon(Icons.save),
                 label: Text(
-                  isSaving ? "Saving..." : "Create Trip",
+                  isSaving
+                      ? "Saving..."
+                      : "Create Trip",
                 ),
-                onPressed: isSaving ? null : saveTrip,
+                onPressed:
+                isSaving ? null : saveTrip,
               ),
             ),
           ],

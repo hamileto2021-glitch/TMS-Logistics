@@ -90,15 +90,16 @@ class _TripListScreenState
         label: const Text("Trip"),
         onPressed: () async {
 
-          await Navigator.push(
+          final created = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-              const TripFormScreen(),
+              builder: (_) => const TripFormScreen(),
             ),
           );
 
-          _refresh();
+          if (created == true) {
+            _refresh();
+          }
         },
       ),
 
@@ -136,8 +137,8 @@ class _TripListScreenState
             );
           }
 
-          final trips =
-          _filter(snapshot.data!);
+          final allTrips = snapshot.data!;
+          final trips = _filter(allTrips);
 
           return RefreshIndicator(
 

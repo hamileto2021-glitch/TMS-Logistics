@@ -8,6 +8,10 @@ import '../../features/vehicles/screens/vehicle_list_screen.dart';
 import '../../features/drivers/screens/driver_list_screen.dart';
 import '../../features/fleet/screens/live_fleet_screen.dart';
 import '../../features/dashboard/screens/dashboard_screen.dart';
+import '../../features/reports/screens/reports_screen.dart';
+import '../../features/notifications/screens/notifications_screen.dart';
+
+
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -104,6 +108,20 @@ class AppDrawer extends StatelessWidget {
             Icons.local_shipping,
             "Live Fleet",
             const LiveFleetScreen(),
+          ),
+
+          _menu(
+            context,
+            Icons.analytics,
+            "Reports & Analytics",
+            const ReportsScreen(),
+          ),
+
+          _menu(
+            context,
+            Icons.notifications,
+            "Notifications",
+            const NotificationsScreen(),
           ),
 
           const Spacer(),

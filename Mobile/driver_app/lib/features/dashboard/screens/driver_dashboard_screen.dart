@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import '../models/driver_dashboard.dart';
 import '../services/driver_dashboard_service.dart';
 import '../../trips/screens/active_trip_screen.dart';
 import '../../trips/screens/trip_history_screen.dart';
 import '../../trips/trip_list_screen.dart';
+import '../providers/driver_dashboard_provider.dart';
+
 
 class DriverDashboardScreen extends StatefulWidget {
   const DriverDashboardScreen({super.key});
@@ -17,23 +19,21 @@ class DriverDashboardScreen extends StatefulWidget {
 class _DriverDashboardScreenState
     extends State<DriverDashboardScreen> {
 
-  final DriverDashboardService _service =
-  DriverDashboardService();
 
-  late Future<DriverDashboard> _dashboard;
+
+
 
   @override
   void initState() {
     super.initState();
-    _dashboard = _service.loadDashboard();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<DriverDashboardProvider>().loadDashboard();
+    });
   }
 
   Future<void> _refresh() async {
-    setState(() {
-      _dashboard = _service.loadDashboard();
-    });
-
-    await _dashboard;
+    await context.read<DriverDashboardProvider>().refresh();
   }
 
   @override
@@ -45,24 +45,22 @@ class _DriverDashboardScreenState
       ),
       body: RefreshIndicator(
         onRefresh: _refresh,
-        child: FutureBuilder<DriverDashboard>(
-          future: _dashboard,
-          builder: (context, snapshot) {
+        child: Consumer<DriverDashboardProvider>(
+          builder: (context, provider, child) {
 
-            if (snapshot.connectionState ==
-                ConnectionState.waiting) {
+            if (provider.isLoading) {
               return const Center(
                 child: CircularProgressIndicator(),
               );
             }
 
-            if (snapshot.hasError) {
+            if (provider.error != null) {
               return ListView(
                 children: [
                   const SizedBox(height: 120),
                   Center(
                     child: Text(
-                      snapshot.error.toString(),
+                      provider.error!,
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -70,7 +68,7 @@ class _DriverDashboardScreenState
               );
             }
 
-            final dashboard = snapshot.data!;
+            final dashboard = provider.dashboard!;
 
             return ListView(
               padding: const EdgeInsets.all(16),
