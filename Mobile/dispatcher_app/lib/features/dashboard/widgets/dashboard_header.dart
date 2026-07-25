@@ -34,9 +34,7 @@ class DashboardHeader extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: () {
-                  Scaffold.of(context).openDrawer();
-                },
+                onPressed: onMenuPressed,
                 icon: const Icon(
                   Icons.menu,
                   color: Colors.white,

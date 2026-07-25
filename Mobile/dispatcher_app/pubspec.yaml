@@ -11,8 +11,15 @@ dependencies:
   flutter:
     sdk: flutter
 
+  flutter_localizations:
+    sdk: flutter
+
+  intl: ^0.20.2
+
+
   cupertino_icons: ^1.0.8
 
+  shared_preferences: ^2.5.3
 
   google_maps_flutter: ^2.12.3
   flutter_polyline_points: ^2.1.0
@@ -21,25 +28,12 @@ dependencies:
   http: ^1.2.1
   fl_chart: ^0.68.0
   pdf: ^3.11.1
-
   printing: ^5.13.4
-
-
-
-  # Networking
   dio: ^5.9.0
-
-  # State Management
   provider: ^6.1.5
-
-  # Secure JWT Storage
   flutter_secure_storage: ^9.2.4
-
-  # Navigation
   go_router: ^16.2.1
 
-  # Date Formatting
-  intl: ^0.20.2
 
 dev_dependencies:
   flutter_test:
@@ -48,6 +42,7 @@ dev_dependencies:
   flutter_lints: ^5.0.0
 
 flutter:
+  generate: true
   uses-material-design: true
 
   assets:

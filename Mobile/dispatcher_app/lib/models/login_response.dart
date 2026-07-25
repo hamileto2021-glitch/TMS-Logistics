@@ -2,7 +2,23 @@ class LoginResponse {
   final String token;
   final String message;
 
-  LoginResponse({required this.token, required this.message});
+  final int id;
+  final String fullName;
+  final String email;
+  final String role;
+  final int? driverId;
+  final int? vehicleId;
+
+  LoginResponse({
+    required this.token,
+    required this.message,
+    required this.id,
+    required this.fullName,
+    required this.email,
+    required this.role,
+    this.driverId,
+    this.vehicleId,
+  });
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) {
     final token = _extractToken(json);
@@ -10,6 +26,13 @@ class LoginResponse {
     return LoginResponse(
       token: token,
       message: json["message"]?.toString() ?? "",
+
+      id: json["id"] ?? 0,
+      fullName: json["fullName"]?.toString() ?? "",
+      email: json["email"]?.toString() ?? "",
+      role: json["role"]?.toString() ?? "",
+      driverId: json["driverId"],
+      vehicleId: json["vehicleId"],
     );
   }
 
@@ -30,13 +53,17 @@ class LoginResponse {
     }
 
     final data = json["data"];
+
     if (data is Map<String, dynamic>) {
       final nested = _extractToken(data);
       if (nested.isNotEmpty) {
         return nested;
       }
     } else if (data is Map) {
-      final nested = _extractToken(Map<String, dynamic>.from(data));
+      final nested = _extractToken(
+        Map<String, dynamic>.from(data),
+      );
+
       if (nested.isNotEmpty) {
         return nested;
       }
@@ -49,12 +76,11 @@ class LoginResponse {
     if (rawToken == null) return "";
 
     final trimmed = rawToken.trim();
+
     if (trimmed.isEmpty) return "";
 
-    final withoutBearer = trimmed.toLowerCase().startsWith("bearer ")
+    return trimmed.toLowerCase().startsWith("bearer ")
         ? trimmed.substring(7).trim()
         : trimmed;
-
-    return withoutBearer;
   }
 }

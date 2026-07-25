@@ -7,16 +7,12 @@ import '../storage/token_storage.dart';
 import '../../models/customer.dart';
 
 class CustomerService {Future<void> createCustomer(Customer customer) async {
-  final token = await _storage.getToken();
+
 
   await ApiClient.dio.post(
     ApiEndpoints.customers,
     data: customer.toJson(),
-    options: Options(
-      headers: {
-        "Authorization": "Bearer $token",
-      },
-    ),
+
   );
 }
 

@@ -18,4 +18,6 @@ class ApiEndpoints {
   static const String drivers = "/Drivers";
 
   static const String tracking = "/Tracking";
+
+  static const currentUser = "$baseUrl/Auth/me";
 }

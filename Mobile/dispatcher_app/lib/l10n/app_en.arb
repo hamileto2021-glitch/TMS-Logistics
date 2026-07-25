@@ -1,0 +1,17 @@
+{
+  "@@locale": "en",
+  "appName": "TMS Logistics",
+  "settings": "Settings",
+  "profile": "My Profile",
+  "changePassword": "Change Password",
+  "appearance": "Appearance",
+  "language": "Language",
+  "notifications": "Notifications",
+  "security": "Security",
+  "about": "About",
+  "logout": "Logout",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System",
+  "synchronization": "Synchronization"
+}
