@@ -60,4 +60,37 @@ class TrackingService {
         .map((e) => VehicleLocation.fromJson(e))
         .toList();
   }
+  /// Send current GPS location to the server
+  Future<void> saveLocation({
+    required int tripId,
+    required double latitude,
+    required double longitude,
+    double speed = 0,
+    double heading = 0,
+  }) async {
+    final token = await _storage.getToken();
+
+    final response = await http.post(
+      Uri.parse("${ApiConstants.baseUrl}/Tracking/location"),
+      headers: {
+        "Authorization": "Bearer $token",
+        "Content-Type": "application/json",
+      },
+      body: jsonEncode({
+        "tripId": tripId,
+        "latitude": latitude,
+        "longitude": longitude,
+        "speed": speed,
+        "heading": heading,
+      }),
+    );
+
+    print("POST Tracking Location");
+    print("Status Code: ${response.statusCode}");
+    print("Response: ${response.body}");
+
+    if (response.statusCode != 200) {
+      throw Exception("Unable to save vehicle location.");
+    }
+  }
 }

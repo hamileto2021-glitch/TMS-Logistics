@@ -11,6 +11,7 @@ import '../widgets/trip_metrics_card.dart';
 import '../widgets/trip_timeline_card.dart';
 import '../../delivery/screens/delivery_details_screen.dart';
 import '../../delivery/screens/delivery_form_screen.dart';
+import '../../../core/services/tracking_manager.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -179,10 +180,15 @@ class _TripDetailsScreenState
           child: ElevatedButton.icon(
           icon: const Icon(Icons.play_arrow),
           label: const Text("Start"),
-          onPressed: () async {
-          await _service.startTrip(trip.id);
-          await _reload();
-          },
+            onPressed: () async {
+              await _service.startTrip(trip.id);
+
+              await TrackingManager.instance.startTracking(
+                trip.id,
+              );
+
+              await _reload();
+            },
           ),
           ),
 
@@ -207,10 +213,13 @@ class _TripDetailsScreenState
           ),
           icon: const Icon(Icons.cancel),
           label: const Text("Cancel"),
-          onPressed: () async {
-          await _service.cancelTrip(trip.id);
-          await _reload();
-          },
+            onPressed: () async {
+              await TrackingManager.instance.stopTracking();
+
+              await _service.cancelTrip(trip.id);
+
+              await _reload();
+            },
           ),
           ),
           ],
@@ -244,6 +253,7 @@ class _TripDetailsScreenState
                                 );
 
                                 if (result == true) {
+                                  await TrackingManager.instance.stopTracking();
                                   await _reload();
                                 }
                               },
@@ -280,6 +290,7 @@ class _TripDetailsScreenState
                                 );
 
                                 if (result == true) {
+                                  await TrackingManager.instance.stopTracking();
                                   await _reload();
                                 }
                               },
@@ -353,32 +364,33 @@ class _TripDetailsScreenState
                     },
                   ),
                 ),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton.icon(
-                    icon: const Icon(Icons.verified),
-                    label: const Text(
-                      "VIEW PROOF OF DELIVERY",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DeliveryDetailsScreen(
-                            tripId: trip.id,
+                    const SizedBox(height: 12),
+
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.verified),
+                        label: const Text(
+                          "VIEW PROOF OF DELIVERY",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-
-              ],
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DeliveryDetailsScreen(
+                                tripId: trip.id,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
                 ),
           );
