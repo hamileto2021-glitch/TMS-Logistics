@@ -30,6 +30,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
   final VehicleService vehicleService = VehicleService();
   final DriverService driverService = DriverService();
   final DispatchService dispatchService = DispatchService();
+  final _formKey = GlobalKey<FormState>();
 
   final TextEditingController notesController =
   TextEditingController();
@@ -55,7 +56,6 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
 
   Future<void> loadData() async {
     try {
-
       shipments = await shipmentService.getShipments();
 
       print("========== SHIPMENTS ==========");
@@ -83,21 +83,17 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
       drivers = drivers
           .where((e) => e.status == "Available")
           .toList();
-
     } finally {
-
       if (mounted) {
         setState(() {
           loading = false;
         });
       }
-
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     if (loading) {
       return const Scaffold(
         body: Center(
@@ -111,228 +107,242 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
         title: const Text("Create Dispatch"),
       ),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      body: Form(
+        key: _formKey,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
 
-            const Text(
-              "Shipment",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            DropdownButtonFormField<Shipment>(
-              value: selectedShipment,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-              items: shipments.map((shipment) {
-                return DropdownMenuItem(
-                  value: shipment,
-                  child: Text(
-                    "${shipment.shipmentNumber} | ${shipment.origin} → ${shipment.destination}",
-                  ),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedShipment = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Vehicle",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            DropdownButtonFormField<Vehicle>(
-              value: selectedVehicle,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-              items: vehicles.map((vehicle) {
-                return DropdownMenuItem(
-                  value: vehicle,
-                  child: Text(vehicle.plateNumber),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedVehicle = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Driver",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            DropdownButtonFormField<Driver>(
-              value: selectedDriver,
-              decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-              ),
-              items: drivers.map((driver) {
-                return DropdownMenuItem(
-                  value: driver,
-                  child: Text(driver.fullName),
-                );
-              }).toList(),
-              onChanged: (value) {
-                setState(() {
-                  selectedDriver = value;
-                });
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            const Text(
-              "Dispatch Date",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 8),
-
-            ListTile(
-              tileColor: Colors.grey.shade200,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              title: Text(
-                "${selectedDate.day}/${selectedDate.month}/${selectedDate.year}",
-              ),
-              trailing: const Icon(Icons.calendar_month),
-              onTap: () async {
-                final picked = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2035),
-                );
-
-                if (picked != null) {
-                  setState(() {
-                    selectedDate = picked;
-                  });
-                }
-              },
-            ),
-
-            const SizedBox(height: 20),
-
-            TextField(
-              controller: notesController,
-              maxLines: 4,
-              decoration: const InputDecoration(
-                labelText: "Notes",
-                border: OutlineInputBorder(),
-              ),
-            ),
-
-            const SizedBox(height: 30),
-
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: saving
-                    ? null
-                    : () async {
-
-                  if (selectedShipment == null ||
-                      selectedVehicle == null ||
-                      selectedDriver == null) {
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Please select Shipment, Vehicle and Driver.",
-                        ),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-
-                    return;
-                  }
-
-                  setState(() {
-                    saving = true;
-                  });
-
-                  try {
-
-                    final request = CreateDispatchRequest(
-                      shipmentId: selectedShipment!.id,
-                      vehicleId: selectedVehicle!.id,
-                      driverId: selectedDriver!.id,
-                      dispatchDate: selectedDate,
-                      notes: notesController.text,
-                    );
-
-                    await dispatchService.createDispatch(request);
-
-                    if (!mounted) return;
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          "Dispatch created successfully.",
-                        ),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
-
-                    Navigator.pop(context, true);
-
-                  } catch (e) {
-
-                    if (!mounted) return;
-
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(e.toString()),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-
-                  } finally {
-
-                    if (mounted) {
-                      setState(() {
-                        saving = false;
-                      });
-                    }
-
-                  }
-                },
-                child: const Text(
-                  "CREATE DISPATCH",
+              const Text(
+                "Shipment",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-            ),
-          ],
+
+              const SizedBox(height: 8),
+
+              DropdownButtonFormField<Shipment>(
+                value: selectedShipment,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+
+                validator: (value) {
+                  if (value == null) {
+                    return "Please select a shipment";
+                  }
+                  return null;
+                },
+
+                items: shipments.map((shipment) {
+                  return DropdownMenuItem(
+                    value: shipment,
+                    child: Text(
+                      "${shipment.shipmentNumber} | ${shipment
+                          .origin} → ${shipment.destination}",
+                    ),
+                  );
+                }).toList(),
+
+                onChanged: (value) {
+                  setState(() {
+                    selectedShipment = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Vehicle",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              DropdownButtonFormField<Vehicle>(
+                value: selectedVehicle,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null) {
+                    return "Please select a vehicle";
+                  }
+                  return null;
+                },
+                items: vehicles.map((vehicle) {
+                  return DropdownMenuItem(
+                    value: vehicle,
+                    child: Text(vehicle.plateNumber),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedVehicle = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Driver",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              DropdownButtonFormField<Driver>(
+                value: selectedDriver,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null) {
+                    return "Please select a driver";
+                  }
+                  return null;
+                },
+                items: drivers.map((driver) {
+                  return DropdownMenuItem(
+                    value: driver,
+                    child: Text(driver.fullName),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedDriver = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              const Text(
+                "Dispatch Date",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+              const SizedBox(height: 8),
+
+              ListTile(
+                tileColor: Colors.grey.shade200,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                title: Text(
+                  "${selectedDate.day}/${selectedDate.month}/${selectedDate
+                      .year}",
+                ),
+                trailing: const Icon(Icons.calendar_month),
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: selectedDate,
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2035),
+                  );
+
+                  if (picked != null) {
+                    setState(() {
+                      selectedDate = picked;
+                    });
+                  }
+                },
+              ),
+
+              const SizedBox(height: 20),
+
+              TextFormField(
+                controller: notesController,
+                maxLines: 4,
+                decoration: const InputDecoration(
+                  labelText: "Notes",
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value
+                      .trim()
+                      .isEmpty) {
+                    return "Please enter dispatch notes";
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 30),
+
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: saving
+                      ? null
+                      : () async {
+                    if (!_formKey.currentState!.validate()) {
+                      return;
+                    }
+
+                    setState(() {
+                      saving = true;
+                    });
+
+                    try {
+                      final request = CreateDispatchRequest(
+                        shipmentId: selectedShipment!.id,
+                        vehicleId: selectedVehicle!.id,
+                        driverId: selectedDriver!.id,
+                        dispatchDate: selectedDate,
+                        notes: notesController.text,
+                      );
+
+                      await dispatchService.createDispatch(request);
+
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            "Dispatch created successfully.",
+                          ),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      Navigator.pop(context, true);
+                    } catch (e) {
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(e.toString()),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          saving = false;
+                        });
+                      }
+                    }
+                  },
+                  child: const Text(
+                    "CREATE DISPATCH",
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

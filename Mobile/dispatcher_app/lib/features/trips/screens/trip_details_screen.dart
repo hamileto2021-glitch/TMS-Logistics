@@ -10,6 +10,7 @@ import '../widgets/trip_detail_row.dart';
 import '../widgets/trip_metrics_card.dart';
 import '../widgets/trip_timeline_card.dart';
 import '../../delivery/screens/delivery_details_screen.dart';
+import '../../delivery/screens/delivery_form_screen.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -171,46 +172,124 @@ class _TripDetailsScreenState
 
                 const SizedBox(height: 20),
 
-                Row(
-                  children: [
+          if (trip.status == "Scheduled")
+          Row(
+          children: [
+          Expanded(
+          child: ElevatedButton.icon(
+          icon: const Icon(Icons.play_arrow),
+          label: const Text("Start"),
+          onPressed: () async {
+          await _service.startTrip(trip.id);
+          await _reload();
+          },
+          ),
+          ),
 
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text("Start"),
-                        onPressed: () async {
+          const SizedBox(width: 8),
 
-                          await _service.startTrip(
-                            trip.id,
-                          );
+          Expanded(
+          child: ElevatedButton.icon(
+          icon: const Icon(Icons.edit),
+          label: const Text("Edit"),
+          onPressed: () async {
+          // Open TripFormScreen in edit mode
+          },
+          ),
+          ),
 
-                          await _reload();
-                        },
+          const SizedBox(width: 8),
+
+          Expanded(
+          child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          ),
+          icon: const Icon(Icons.cancel),
+          label: const Text("Cancel"),
+          onPressed: () async {
+          await _service.cancelTrip(trip.id);
+          await _reload();
+          },
+          ),
+          ),
+          ],
+          ),
+                    if (trip.status == "In Progress")
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.pause),
+                              label: const Text("Pause"),
+                              onPressed: () async {
+                                await _service.pauseTrip(trip.id);
+                                await _reload();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.check),
+                              label: const Text("Complete"),
+                              onPressed: () async {
+                                final result = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DeliveryFormScreen(
+                                      tripId: trip.id,
+                                    ),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  await _reload();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    if (trip.status == "Paused")
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text("Resume"),
+                              onPressed: () async {
+                                await _service.resumeTrip(trip.id);
+                                await _reload();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.check),
+                              label: const Text("Complete"),
+                              onPressed: () async {
+                                final result = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DeliveryFormScreen(
+                                      tripId: trip.id,
+                                    ),
+                                  ),
+                                );
 
-                    const SizedBox(width: 10),
-
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.check),
-                        label: const Text("Complete"),
-                        onPressed: () async {
-
-                          await _service.completeTrip(
-                            trip.id,
-                          );
-
-                          await _reload();
-                        },
+                                if (result == true) {
+                                  await _reload();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-
-                  ],
-                ),
 
                 const SizedBox(height: 15),
-
+                    if (trip.status == "Completed")
                 SizedBox(
                   width: double.infinity,
 

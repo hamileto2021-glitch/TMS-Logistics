@@ -53,11 +53,13 @@ class _DeliveryDetailsScreenState
       appBar: AppBar(
         title: const Text("Proof of Delivery"),
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+      body: RefreshIndicator(
+        onRefresh: load,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
 
-          Text(
+            Text(
             delivery!.shipmentNumber,
             style: const TextStyle(
               fontSize: 22,
@@ -99,8 +101,7 @@ class _DeliveryDetailsScreenState
           ),
 
           const SizedBox(height: 10),
-
-          if (delivery!.photoPath != null)
+              if (delivery!.photoPath != null)
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
@@ -114,12 +115,66 @@ class _DeliveryDetailsScreenState
               ),
             ),
 
+    const SizedBox(height: 25),
+
+    const Text(
+    "Customer Signature",
+    style: TextStyle(
+    fontSize: 18,
+    fontWeight: FontWeight.bold,
+    ),
+    ),
+
+    const SizedBox(height: 10),
+
+    if (delivery!.signaturePath != null)
+    ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: Image.network(
+    "${ApiConstants.baseUrl.replaceFirst('/api', '')}/${delivery!.signaturePath!}",
+    height: 180,
+    fit: BoxFit.contain,
+    errorBuilder: (_, __, ___) =>
+    const Text("Unable to load signature."),
+    ),
+    ),
+
           const SizedBox(height: 20),
 
           Text(delivery!.notes),
 
-        ],
-      ),
+    const SizedBox(height: 20),
+
+    const Text(
+    "Delivery Location",
+    style: TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+    ),
+    ),
+
+    const SizedBox(height: 8),
+
+    Text("Latitude : ${delivery!.latitude}"),
+    Text("Longitude : ${delivery!.longitude}"),
+
+    const SizedBox(height: 20),
+
+    const Text(
+    "Delivery Information",
+    style: TextStyle(
+    fontWeight: FontWeight.bold,
+    fontSize: 18,
+    ),
+    ),
+
+    const SizedBox(height: 8),
+
+            // Text("Delivered At : ${delivery!.deliveryDate}"),
+
+    ],
+    ),
+    ),
     );
   }
 }

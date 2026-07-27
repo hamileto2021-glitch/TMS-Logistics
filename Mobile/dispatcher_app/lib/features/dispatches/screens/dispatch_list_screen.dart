@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/services/dispatch_service.dart';
+import '../../../core/widgets/app_status_chip.dart';
 import '../../../models/dispatch.dart';
+
 import 'dispatch_form_screen.dart';
 import 'dispatch_details_screen.dart';
 
@@ -13,120 +15,287 @@ class DispatchListScreen extends StatefulWidget {
 }
 
 class _DispatchListScreenState extends State<DispatchListScreen> {
-  final DispatchService _service = DispatchService();
+final DispatchService _service = DispatchService();
 
-  late Future<List<Dispatch>> _dispatches;
+final TextEditingController _searchController =
+TextEditingController();
 
-  @override
-  void initState() {
-    super.initState();
-    _dispatches = _service.getDispatches();
-  }
+String _searchText = "";
 
-  Future<void> _refresh() async {
-    setState(() {
-      _dispatches = _service.getDispatches();
-    });
-  }
+late Future<List<Dispatch>> _dispatches;
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("Dispatches"),
+@override
+void initState() {
+super.initState();
+_dispatches = _service.getDispatches();
+}
+
+@override
+void dispose() {
+_searchController.dispose();
+super.dispose();
+}
+
+Future<void> _refresh() async {
+setState(() {
+_dispatches = _service.getDispatches();
+});
+}
+
+@override
+Widget build(BuildContext context) {
+return Scaffold(
+appBar: AppBar(
+title: const Text("Dispatches"),
+centerTitle: true,
+),
+
+floatingActionButton: FloatingActionButton(
+child: const Icon(Icons.add),
+onPressed: () async {
+final result = await Navigator.push(
+context,
+MaterialPageRoute(
+builder: (_) => const DispatchFormScreen(),
+),
+);
+
+if (result == true) {
+_refresh();
+}
+},
+),
+
+body: FutureBuilder<List<Dispatch>>(
+future: _dispatches,
+builder: (context, snapshot) {
+
+if (snapshot.connectionState ==
+ConnectionState.waiting) {
+return const Center(
+child: CircularProgressIndicator(),
+);
+}
+
+if (snapshot.hasError) {
+return Center(
+child: Text(
+snapshot.error.toString(),
+),
+);
+}
+
+final dispatches = snapshot.data ?? [];
+
+final filteredDispatches =
+dispatches.where((dispatch) {
+final search = _searchText.toLowerCase();
+
+return dispatch.dispatchNumber
+.toLowerCase()
+.contains(search) ||
+dispatch.shipmentNumber
+.toLowerCase()
+.contains(search) ||
+dispatch.driverName
+.toLowerCase()
+.contains(search) ||
+dispatch.plateNumber
+.toLowerCase()
+.contains(search);
+}).toList();
+if (dispatches.isEmpty) {
+return const Center(
+child: Column(
+mainAxisAlignment: MainAxisAlignment.center,
+children: [
+Icon(
+Icons.local_shipping_outlined,
+size: 80,
+color: Colors.grey,
+),
+SizedBox(height: 16),
+Text(
+"No Dispatches Found",
+style: TextStyle(
+fontSize: 20,
+fontWeight: FontWeight.bold,
+),
+),
+SizedBox(height: 8),
+Text(
+"Tap + to create your first dispatch.",
+style: TextStyle(
+color: Colors.grey,
+),
+),
+],
+),
+);
+}
+
+return Column(
+children: [
+
+Padding(
+padding: const EdgeInsets.all(12),
+child: TextField(
+controller: _searchController,
+decoration: InputDecoration(
+hintText: "Search dispatch...",
+prefixIcon: const Icon(Icons.search),
+suffixIcon: _searchText.isEmpty
+? null
+: IconButton(
+icon: const Icon(Icons.clear),
+onPressed: () {
+_searchController.clear();
+setState(() {
+_searchText = "";
+});
+},
+),
+border: OutlineInputBorder(
+borderRadius: BorderRadius.circular(12),
+),
+),
+onChanged: (value) {
+setState(() {
+_searchText = value;
+});
+},
+),
+),
+
+Expanded(
+child: RefreshIndicator(
+onRefresh: _refresh,
+child: ListView.builder(
+padding: const EdgeInsets.only(bottom: 80),
+itemCount: filteredDispatches.length,
+itemBuilder: (context, index) {
+
+final dispatch = filteredDispatches[index];
+return Card(
+  elevation: 2,
+  margin: const EdgeInsets.symmetric(
+    horizontal: 12,
+    vertical: 6,
+  ),
+  shape: RoundedRectangleBorder(
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: ListTile(
+    contentPadding: const EdgeInsets.all(16),
+
+    onTap: () async {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DispatchDetailsScreen(
+            dispatch: dispatch,
+          ),
+        ),
+      );
+
+      if (result == true) {
+        _refresh();
+      }
+    },
+
+    leading: CircleAvatar(
+      radius: 24,
+      child: Text(
+        dispatch.id.toString(),
       ),
+    ),
 
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => const DispatchFormScreen(),
-            ),
-          );
-
-          if (result == true) {
-            _refresh();
-          }
-        },
-        child: const Icon(Icons.add),
+    title: Text(
+      dispatch.dispatchNumber,
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 16,
       ),
+    ),
 
-      body: FutureBuilder<List<Dispatch>>(
-        future: _dispatches,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+    subtitle: Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Column(
+        crossAxisAlignment:
+        CrossAxisAlignment.start,
+        children: [
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error.toString()),
-            );
-          }
+          Row(
+            children: [
+              const Icon(
+                Icons.inventory_2,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Shipment: ${dispatch.shipmentNumber}",
+                ),
+              ),
+            ],
+          ),
 
-          final dispatches = snapshot.data ?? [];
+          const SizedBox(height: 6),
 
-          if (dispatches.isEmpty) {
-            return const Center(
-              child: Text("No Dispatches Found"),
-            );
-          }
+          Row(
+            children: [
+              const Icon(
+                Icons.person,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Driver: ${dispatch.driverName}",
+                ),
+              ),
+            ],
+          ),
 
-          return RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView.builder(
-              itemCount: dispatches.length,
-              itemBuilder: (context, index) {
-                final dispatch = dispatches[index];
+          const SizedBox(height: 6),
 
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  child: ListTile(
+          Row(
+            children: [
+              const Icon(
+                Icons.local_shipping,
+                size: 18,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  "Vehicle: ${dispatch.plateNumber}",
+                ),
+              ),
+            ],
+          ),
 
-                    onTap: () async {
+          const SizedBox(height: 10),
 
-                      final result = await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => DispatchDetailsScreen(
-                            dispatch: dispatch,
-                          ),
-                        ),
-                      );
-
-                      if (result == true) {
-                        _refresh();
-                      }
-
-                    },
-
-                    leading: CircleAvatar(
-                      child: Text(dispatch.id.toString()),
-                    ),
-
-                    title: Text(dispatch.dispatchNumber),
-
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Shipment : ${dispatch.shipmentNumber}"),
-                        Text("Driver : ${dispatch.driverName}"),
-                        Text("Vehicle : ${dispatch.plateNumber}"),
-                        Text("Status : ${dispatch.status}"),
-                      ],
-                    ),
-
-                    trailing: const Icon(Icons.arrow_forward_ios),
-                  ),
-                );
-              },
-            ),
-          );
-        },
+          AppStatusChip(
+            status: dispatch.status,
+          ),
+        ],
       ),
-    );
-  }
+    ),
+
+    trailing: const Icon(
+      Icons.arrow_forward_ios,
+    ),
+  ),
+);
+},
+),
+),
+),
+],
+);
+},
+),
+);
+}
 }

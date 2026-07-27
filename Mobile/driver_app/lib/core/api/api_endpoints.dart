@@ -1,5 +1,5 @@
 class ApiEndpoints {
-  static const String server = "http://10.48.91.92:5085";
+  static const String server = "http://10.224.215.92:5085";
 
   static const String baseUrl = "$server/api";
 

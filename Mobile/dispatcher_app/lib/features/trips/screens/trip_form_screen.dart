@@ -5,9 +5,17 @@ import '../../../core/services/trip_service.dart';
 
 import '../../../models/dispatch.dart';
 import '../../../models/create_trip_request.dart';
+import '../../../models/trip.dart';
+import '../../../models/update_trip_request.dart';
+
 
 class TripFormScreen extends StatefulWidget {
-  const TripFormScreen({super.key});
+  final Trip? trip;
+
+  const TripFormScreen({
+    super.key,
+    this.trip,
+  });
 
   @override
   State<TripFormScreen> createState() => _TripFormScreenState();
@@ -28,12 +36,19 @@ class _TripFormScreenState extends State<TripFormScreen> {
 
   bool loading = true;
   bool isSaving = false;
+  bool get isEdit => widget.trip != null;
 
   DateTime plannedStartTime = DateTime.now();
 
   @override
   void initState() {
     super.initState();
+
+    if (isEdit) {
+      plannedStartTime = widget.trip!.startTime ?? DateTime.now();
+      remarksController.text = widget.trip!.remarks;
+    }
+
     loadDispatches();
   }
 
@@ -44,6 +59,12 @@ class _TripFormScreenState extends State<TripFormScreen> {
       dispatches = dispatches
           .where((e) => e.status == "Scheduled")
           .toList();
+      if (isEdit) {
+        selectedDispatch = dispatches.firstWhere(
+              (d) => d.id == widget.trip!.dispatchId,
+        );
+      }
+
     } finally {
       if (mounted) {
         setState(() {
@@ -82,14 +103,36 @@ class _TripFormScreenState extends State<TripFormScreen> {
         remarks: remarksController.text,
       );
 
-      await tripService.createTrip(request);
+      if (isEdit) {
+        await tripService.updateTrip(
+          widget.trip!.id,
+          UpdateTripRequest(
+            startTime: plannedStartTime,
+            endTime: widget.trip!.endTime,
+            distance: widget.trip!.distanceKm,
+            fuel: widget.trip!.fuelUsed,
+            odometer: widget.trip!.odometer,
+            currentLocation: widget.trip!.currentLocation,
+            delayReason: widget.trip!.delayReason,
+            status: widget.trip!.status,
+            remarks: remarksController.text,
+          ),
+
+        );
+      } else {
+        await tripService.createTrip(request);
+      }
 
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Trip created successfully"),
-        ),
+          SnackBar(
+            content: Text(
+              isEdit
+                  ? "Trip updated successfully"
+                  : "Trip created successfully",
+            ),
+          )
       );
 
       Navigator.pop(context, true);
@@ -110,17 +153,15 @@ class _TripFormScreenState extends State<TripFormScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    remarksController.dispose();
-    super.dispose();
-  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Create Trip"),
+        title: Text(
+          isEdit ? "Edit Trip" : "Create Trip",
+        ),
       ),
       body: loading
           ? const Center(
@@ -203,7 +244,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
                 label: Text(
                   isSaving
                       ? "Saving..."
-                      : "Create Trip",
+                      : (isEdit ? "Update Trip" : "Create Trip"),
                 ),
                 onPressed:
                 isSaving ? null : saveTrip,
