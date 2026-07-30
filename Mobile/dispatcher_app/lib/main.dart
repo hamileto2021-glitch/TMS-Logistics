@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_service.dart';
-import 'features/auth/login_screen.dart';
 import 'core/localization/locale_service.dart';
 import 'features/splash/screens/splash_screen.dart';
 
 import 'l10n/app_localizations.dart';
+import 'package:provider/provider.dart';
+
+import 'features/notifications/controllers/notification_controller.dart';
 
 void main() {
   runApp(const TmsApp());
@@ -44,20 +46,27 @@ class _TmsAppState extends State<TmsApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => NotificationController(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
 
-      locale: _localeService.locale,
+        locale: _localeService.locale,
 
-      supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: AppLocalizations.supportedLocales,
 
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
 
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: _themeService.themeMode,
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: _themeService.themeMode,
 
-      home: const SplashScreen(),
+        home: const SplashScreen(),
+      ),
     );
   }
 }

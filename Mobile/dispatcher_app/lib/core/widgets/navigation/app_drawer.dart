@@ -13,6 +13,7 @@ import '../../../features/reports/screens/reports_screen.dart';
 import '../../../features/notifications/screens/notifications_screen.dart';
 import '../../../features/settings/screens/settings_screen.dart';
 
+
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
 
@@ -111,7 +112,7 @@ class AppDrawer extends StatelessWidget {
               context,
               Icons.notifications,
               "Notifications",
-              const NotificationsScreen(),
+                const NotificationScreen()
             ),
 
             const Divider(),

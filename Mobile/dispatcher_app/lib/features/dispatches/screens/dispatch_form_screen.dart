@@ -124,7 +124,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
               const SizedBox(height: 8),
 
               DropdownButtonFormField<Shipment>(
-                value: selectedShipment,
+                initialValue: selectedShipment,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
@@ -165,7 +165,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
               const SizedBox(height: 8),
 
               DropdownButtonFormField<Vehicle>(
-                value: selectedVehicle,
+                initialValue: selectedVehicle,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),
@@ -200,7 +200,7 @@ class _DispatchFormScreenState extends State<DispatchFormScreen> {
               const SizedBox(height: 8),
 
               DropdownButtonFormField<Driver>(
-                value: selectedDriver,
+                initialValue: selectedDriver,
                 decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                 ),

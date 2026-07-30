@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../core/services/auth_manager.dart';
 import '../../auth/login_screen.dart';
 import '../../dashboard/screens/dashboard_screen.dart';
-import '../../../core/storage/token_storage.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});

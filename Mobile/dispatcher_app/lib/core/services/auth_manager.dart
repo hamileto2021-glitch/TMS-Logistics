@@ -1,7 +1,6 @@
 import 'package:dispatcher_app/core/services/session_manager.dart';
 
 import '../storage/token_storage.dart';
-import '../storage/user_storage.dart';
 import 'auth_service.dart';
 
 class AuthManager {

@@ -37,65 +37,75 @@ class DashboardStatistics extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(20),
-      child: GridView.count(
-        crossAxisCount: 2,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 0.90,
-        children: [
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
 
-          DashboardGridCard(
-            title: "Customers",
-            value: customers.toString(),
-            icon: Icons.people,
-            color: Colors.blue,
-            onTap: onCustomersTap,
-          ),
+          final crossAxisCount = width >= 1200
+              ? 4
+              : width >= 800
+              ? 3
+              : 2;
 
-          DashboardGridCard(
-            title: "Shipments",
-            value: shipments.toString(),
-            icon: Icons.inventory,
-            color: Colors.orange,
-            onTap: onShipmentsTap,
-          ),
+          final cards = [
+            DashboardGridCard(
+              title: "Customers",
+              value: customers.toString(),
+              icon: Icons.people,
+              color: Colors.blue,
+              onTap: onCustomersTap,
+            ),
+            DashboardGridCard(
+              title: "Shipments",
+              value: shipments.toString(),
+              icon: Icons.inventory,
+              color: Colors.orange,
+              onTap: onShipmentsTap,
+            ),
+            DashboardGridCard(
+              title: "Dispatches",
+              value: dispatches.toString(),
+              icon: Icons.local_shipping,
+              color: Colors.green,
+              onTap: onDispatchesTap,
+            ),
+            DashboardGridCard(
+              title: "Trips",
+              value: trips.toString(),
+              icon: Icons.route,
+              color: Colors.purple,
+              onTap: onTripsTap,
+            ),
+            DashboardGridCard(
+              title: "Vehicles",
+              value: vehicles.toString(),
+              icon: Icons.directions_bus,
+              color: Colors.red,
+              onTap: onVehiclesTap,
+            ),
+            DashboardGridCard(
+              title: "Drivers",
+              value: drivers.toString(),
+              icon: Icons.person,
+              color: Colors.teal,
+              onTap: onDriversTap,
+            ),
+          ];
 
-          DashboardGridCard(
-            title: "Dispatches",
-            value: dispatches.toString(),
-            icon: Icons.local_shipping,
-            color: Colors.green,
-            onTap: onDispatchesTap,
-          ),
-
-          DashboardGridCard(
-            title: "Trips",
-            value: trips.toString(),
-            icon: Icons.route,
-            color: Colors.purple,
-            onTap: onTripsTap,
-          ),
-
-          DashboardGridCard(
-            title: "Vehicles",
-            value: vehicles.toString(),
-            icon: Icons.directions_bus,
-            color: Colors.red,
-            onTap: onVehiclesTap,
-          ),
-
-          DashboardGridCard(
-            title: "Drivers",
-            value: drivers.toString(),
-            icon: Icons.person,
-            color: Colors.teal,
-            onTap: onDriversTap,
-          ),
-
-        ],
-      ),
+          return GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: cards.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: crossAxisCount,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              mainAxisExtent: 205,
+            ),
+            itemBuilder: (context, index) => cards[index],
+          );
+        },
+      )
     );
   }
 }

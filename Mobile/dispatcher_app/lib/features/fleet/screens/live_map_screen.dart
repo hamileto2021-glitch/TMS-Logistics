@@ -10,14 +10,18 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 
 import '../../tracking/models/route_info.dart';
 import '../../tracking/services/directions_service.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:math' as math;
 
 class LiveMapScreen extends StatefulWidget {
   final LiveTrip trip;
+
 
   const LiveMapScreen({
     super.key,
     required this.trip,
   });
+
 
   @override
   State<LiveMapScreen> createState() => _LiveMapScreenState();
@@ -36,6 +40,7 @@ final TrackingService _service = TrackingService();
 
 Timer? _liveTimer;
 Timer? _replayTimer;
+Timer? _animationTimer;
 
 BitmapDescriptor? _truckIcon;
 
@@ -49,8 +54,21 @@ List<VehicleLocation> _history = [];
 int _currentIndex = 0;
 
 bool _isPlaying = false;
+bool _locationPermissionGranted = false;
 
 double _currentHeading = 0;
+static const int _animationSteps = 20;
+static const Duration _animationDuration =
+Duration(milliseconds: 1000);
+
+double _interpolateHeading(
+    double start,
+    double end,
+    double t,
+    ) {
+  double difference = (end - start + 540) % 360 - 180;
+  return (start + difference * t + 360) % 360;
+}
 
 
 @override
@@ -61,6 +79,7 @@ _initialize();
 }
 
 Future<void> _initialize() async {
+  await _requestLocationPermission();
 await _loadTruckIcon();
 
 _currentPosition = LatLng(
@@ -160,6 +179,19 @@ Future<void> _loadPlannedRoute() async {
     debugPrint("Directions Error: $e");
   }
 }
+Future<void> _requestLocationPermission() async {
+  var status = await Permission.location.status;
+
+  if (!status.isGranted) {
+    status = await Permission.location.request();
+  }
+
+  if (!mounted) return;
+
+  setState(() {
+    _locationPermissionGranted = status.isGranted;
+  });
+}
 Future<void> _refreshLocation() async {
 if (_isPlaying) return;
 
@@ -167,27 +199,72 @@ try {
 final location =
 await _service.getCurrentLocation(widget.trip.tripId);
 
-_currentHeading = location.heading;
-
-_currentPosition = LatLng(
-location.latitude,
-location.longitude,
-);
-
-_updateMarker();
+await _animateToLocation(location);
 
 await _loadRoute();
-
-if (!mounted) return;
-
-setState(() {});
-
-await _controller?.animateCamera(
-CameraUpdate.newLatLng(_currentPosition!),
-);
 } catch (e) {
 debugPrint(e.toString());
 }
+}
+Future<void> _animateToLocation(
+    VehicleLocation location,
+    ) async {
+  if (_currentPosition == null) return;
+
+  _animationTimer?.cancel();
+
+  final startLat = _currentPosition!.latitude;
+  final startLng = _currentPosition!.longitude;
+
+  final endLat = location.latitude;
+  final endLng = location.longitude;
+
+  final startHeading = _currentHeading;
+  final endHeading = location.heading;
+
+  int step = 0;
+
+  _animationTimer = Timer.periodic(
+    Duration(
+      milliseconds:
+      _animationDuration.inMilliseconds ~/ _animationSteps,
+    ),
+        (timer) async {
+      step++;
+
+      final t = step / _animationSteps;
+
+      final lat =
+          startLat + ((endLat - startLat) * t);
+
+      final lng =
+          startLng + ((endLng - startLng) * t);
+
+      final heading =
+      _interpolateHeading(
+        startHeading,
+        endHeading,
+        t,
+      );
+
+      _currentPosition = LatLng(lat, lng);
+      _currentHeading = heading;
+
+      _updateMarker();
+
+      if (mounted) {
+        setState(() {});
+      }
+
+      await _controller?.moveCamera(
+        CameraUpdate.newLatLng(_currentPosition!),
+      );
+
+      if (step >= _animationSteps) {
+        timer.cancel();
+      }
+    },
+  );
 }
 
 void _updateMarker() {
@@ -351,9 +428,9 @@ Widget build(BuildContext context) {
             ..._plannedPolyline,
           },
 
-          myLocationEnabled: true,
+          myLocationEnabled: false,
 
-          myLocationButtonEnabled: true,
+          myLocationButtonEnabled: false,
 
           zoomControlsEnabled: true,
 

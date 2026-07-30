@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../../notifications/controllers/notification_controller.dart';
 import '../../notifications/screens/notifications_screen.dart';
 import '../../notifications/widgets/notification_badge.dart';
 
@@ -80,12 +82,12 @@ class DashboardHeader extends StatelessWidget {
               ),
 
               NotificationBadge(
-                count: 2,
+                count: context.watch<NotificationController>().unreadCount,
                 onTap: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const NotificationsScreen(),
+                      builder: (_) => const NotificationScreen()
                     ),
                   );
                 },

@@ -173,7 +173,7 @@ class _TripFormScreenState extends State<TripFormScreen> {
           padding: const EdgeInsets.all(16),
           children: [
             DropdownButtonFormField<Dispatch>(
-              value: selectedDispatch,
+              initialValue: selectedDispatch,
               decoration: const InputDecoration(
                 labelText: "Dispatch",
                 border: OutlineInputBorder(),

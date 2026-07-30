@@ -16,7 +16,7 @@ class ReportFilterBar extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: DropdownButtonFormField<String>(
-          value: selectedPeriod,
+          initialValue: selectedPeriod,
           decoration: const InputDecoration(
             labelText: "Report Period",
             border: OutlineInputBorder(),

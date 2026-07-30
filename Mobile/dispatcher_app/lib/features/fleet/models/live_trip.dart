@@ -9,6 +9,7 @@ class LiveTrip {
   final double latitude;
   final double longitude;
   final double speed;
+  final double heading;
   final DateTime recordedAt;
   final double originLatitude;
   final double originLongitude;
@@ -27,6 +28,7 @@ class LiveTrip {
     required this.latitude,
     required this.longitude,
     required this.speed,
+    required this.heading,
 
     required this.originLatitude,
     required this.originLongitude,
@@ -36,6 +38,45 @@ class LiveTrip {
 
     required this.recordedAt,
   });
+
+  LiveTrip copyWith({
+    String? tripNumber,
+    String? driverName,
+    String? vehiclePlate,
+    String? origin,
+    String? destination,
+    String? status,
+    double? latitude,
+    double? longitude,
+    double? speed,
+    double? heading,
+    double? originLatitude,
+    double? originLongitude,
+    double? destinationLatitude,
+    double? destinationLongitude,
+    DateTime? recordedAt,
+  }) {
+    return LiveTrip(
+      tripId: tripId,
+      tripNumber: tripNumber ?? this.tripNumber,
+      driverName: driverName ?? this.driverName,
+      vehiclePlate: vehiclePlate ?? this.vehiclePlate,
+      origin: origin ?? this.origin,
+      destination: destination ?? this.destination,
+      status: status ?? this.status,
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      speed: speed ?? this.speed,
+      heading: heading ?? this.heading,
+      originLatitude: originLatitude ?? this.originLatitude,
+      originLongitude: originLongitude ?? this.originLongitude,
+      destinationLatitude:
+      destinationLatitude ?? this.destinationLatitude,
+      destinationLongitude:
+      destinationLongitude ?? this.destinationLongitude,
+      recordedAt: recordedAt ?? this.recordedAt,
+    );
+  }
 
   factory LiveTrip.fromJson(Map<String, dynamic> json) {
     return LiveTrip(
@@ -49,6 +90,7 @@ class LiveTrip {
       latitude: (json["latitude"] as num).toDouble(),
       longitude: (json["longitude"] as num).toDouble(),
       speed: (json["speed"] as num).toDouble(),
+      heading: (json["heading"] as num).toDouble(),
 
       originLatitude: (json["originLatitude"] as num).toDouble(),
       originLongitude: (json["originLongitude"] as num).toDouble(),

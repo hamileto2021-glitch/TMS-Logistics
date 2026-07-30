@@ -39,7 +39,7 @@ class _FleetReportScreenState extends State<FleetReportScreen> {
       elevation: 4,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(.15),
+          backgroundColor: color.withValues(alpha: .15),
           child: Icon(
             icon,
             color: color,
