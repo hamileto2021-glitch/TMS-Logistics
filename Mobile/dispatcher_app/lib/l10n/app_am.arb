@@ -1,0 +1,17 @@
+{
+  "@@locale": "am",
+  "appName": "TMS Logistics",
+  "settings": "ቅንብሮች",
+  "profile": "የእኔ መገለጫ",
+  "changePassword": "የይለፍ ቃል ቀይር",
+  "appearance": "መልክ",
+  "language": "ቋንቋ",
+  "notifications": "ማሳወቂያዎች",
+  "security": "ደህንነት",
+  "about": "ስለ መተግበሪያው",
+  "logout": "ውጣ",
+  "light": "ብርሃን",
+  "dark": "ጨለማ",
+  "system": "ስርዓት",
+  "synchronization": "ማመሳሰል"
+}

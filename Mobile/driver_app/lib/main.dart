@@ -1,10 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'features/tracking/services/trip_tracking_manager.dart';
 
 import 'core/theme/app_theme.dart';
 import 'features/auth/login_screen.dart';
+import 'features/trips/providers/trip_provider.dart';
+import 'features/tracking/providers/tracking_provider.dart';
+import 'features/dashboard/providers/driver_dashboard_provider.dart';
 
 void main() {
-  runApp(const DriverApp());
+  runApp(
+      MultiProvider(
+        providers: [
+          Provider<TripTrackingManager>(
+            create: (_) => TripTrackingManager(),
+          ),
+
+          ChangeNotifierProvider(
+            create: (_) => TripProvider(),
+          ),
+
+          ChangeNotifierProvider(
+            create: (_) => TrackingProvider(),
+          ),
+
+          ChangeNotifierProvider(
+            create: (_) => DriverDashboardProvider(),
+          ),
+        ],
+
+        child: const DriverApp(),
+      )
+  );
 }
 
 class DriverApp extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/trip.dart';
+import '../../../models/trip.dart';
 import 'trip_status_chip.dart';
 
 class TripCard extends StatelessWidget {
@@ -32,7 +32,6 @@ class TripCard extends StatelessWidget {
 
               Row(
                 children: [
-
                   const Icon(
                     Icons.local_shipping,
                     color: Colors.blue,
@@ -59,6 +58,12 @@ class TripCard extends StatelessWidget {
               const SizedBox(height: 16),
 
               _buildRow(
+                Icons.assignment,
+                "Dispatch",
+                trip.dispatchNumber,
+              ),
+
+              _buildRow(
                 Icons.inventory_2,
                 "Shipment",
                 trip.shipmentNumber,
@@ -74,6 +79,14 @@ class TripCard extends StatelessWidget {
                 Icons.person,
                 "Driver",
                 trip.driverName,
+              ),
+
+              _buildRow(
+                Icons.location_on,
+                "Location",
+                trip.currentLocation.isEmpty
+                    ? "Unknown"
+                    : trip.currentLocation,
               ),
 
               const Divider(),

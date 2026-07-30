@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/trip.dart';
+import '../../../models/trip.dart';
 
 class TripTimelineCard extends StatelessWidget {
 

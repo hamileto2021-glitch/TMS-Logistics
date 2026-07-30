@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/dispatch.dart';
+import '../../../models/dispatch.dart';
 
 class DispatchStatistics extends StatelessWidget {
   final List<Dispatch> dispatches;

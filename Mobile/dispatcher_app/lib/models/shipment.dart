@@ -6,6 +6,15 @@ class Shipment {
   final int? vehicleId;
   final int? driverId;
 
+  final String? customerName;
+
+  final String? vehiclePlateNumber;
+
+  final String? vehicleName;
+
+  final String? driverName;
+
+  final String? driverPhone;
   final String origin;
   final String destination;
   final String cargoType;
@@ -26,8 +35,17 @@ class Shipment {
     required this.id,
     required this.shipmentNumber,
     required this.customerId,
+
+    this.customerName,
+
     this.vehicleId,
+    this.vehiclePlateNumber,
+    this.vehicleName,
+
     this.driverId,
+    this.driverName,
+    this.driverPhone,
+
     required this.origin,
     required this.destination,
     required this.cargoType,
@@ -46,6 +64,15 @@ class Shipment {
       id: json["id"] ?? 0,
       shipmentNumber: json["shipmentNumber"] ?? "",
       customerId: json["customerId"] ?? 0,
+      customerName: json["customerName"],
+
+      vehiclePlateNumber: json["vehiclePlateNumber"],
+
+      vehicleName: json["vehicleName"],
+
+      driverName: json["driverName"],
+
+      driverPhone: json["driverPhone"],
       vehicleId: json["vehicleId"],
       driverId: json["driverId"],
       origin: json["origin"] ?? "",
@@ -76,6 +103,15 @@ class Shipment {
       "id": id,
       "shipmentNumber": shipmentNumber,
       "customerId": customerId,
+      "customerName": customerName,
+
+      "vehiclePlateNumber": vehiclePlateNumber,
+
+      "vehicleName": vehicleName,
+
+      "driverName": driverName,
+
+      "driverPhone": driverPhone,
       "vehicleId": vehicleId,
       "driverId": driverId,
       "origin": origin,
@@ -97,8 +133,17 @@ class Shipment {
     int? id,
     String? shipmentNumber,
     int? customerId,
+
+    String? customerName,
+
     int? vehicleId,
+    String? vehiclePlateNumber,
+    String? vehicleName,
+
     int? driverId,
+    String? driverName,
+    String? driverPhone,
+
     String? origin,
     String? destination,
     String? cargoType,
@@ -116,8 +161,24 @@ class Shipment {
       shipmentNumber:
       shipmentNumber ?? this.shipmentNumber,
       customerId: customerId ?? this.customerId,
+      customerName: customerName ?? this.customerName,
+
       vehicleId: vehicleId ?? this.vehicleId,
+
+      vehiclePlateNumber:
+      vehiclePlateNumber ?? this.vehiclePlateNumber,
+
+      vehicleName:
+      vehicleName ?? this.vehicleName,
+
       driverId: driverId ?? this.driverId,
+
+      driverName:
+      driverName ?? this.driverName,
+
+      driverPhone:
+      driverPhone ?? this.driverPhone,
+
       origin: origin ?? this.origin,
       destination: destination ?? this.destination,
       cargoType: cargoType ?? this.cargoType,

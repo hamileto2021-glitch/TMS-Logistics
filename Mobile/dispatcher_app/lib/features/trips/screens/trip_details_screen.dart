@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../models/trip.dart';
-import '../services/trip_service.dart';
+import '../../../models/trip.dart';
+import '../../../core/services/trip_service.dart';
 
 import '../widgets/trip_status_chip.dart';
 import '../widgets/trip_header_card.dart';
@@ -9,6 +9,9 @@ import '../widgets/trip_section_card.dart';
 import '../widgets/trip_detail_row.dart';
 import '../widgets/trip_metrics_card.dart';
 import '../widgets/trip_timeline_card.dart';
+import '../../delivery/screens/delivery_details_screen.dart';
+import '../../delivery/screens/delivery_form_screen.dart';
+import '../../../core/services/tracking_manager.dart';
 
 class TripDetailsScreen extends StatefulWidget {
   final int tripId;
@@ -40,6 +43,8 @@ class _TripDetailsScreenState
     setState(() {
       _future = _service.getTrip(widget.tripId);
     });
+
+    await _future;
   }
 
   @override
@@ -77,24 +82,23 @@ class _TripDetailsScreenState
 
           final trip = snapshot.data!;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
+          return RefreshIndicator(
+              onRefresh: _reload,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: TripStatusChip(
+                        status: trip.status,
+                      ),
+                    ),
 
-            child: Column(
-              crossAxisAlignment:
-              CrossAxisAlignment.start,
+                    const SizedBox(height: 20),
 
-              children: [
-
-                Center(
-                  child: TripStatusChip(
-                    status: trip.status,
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                TripHeaderCard(trip: trip),
+                    TripHeaderCard(trip: trip),
 
                 const SizedBox(height: 16),
 
@@ -169,46 +173,134 @@ class _TripDetailsScreenState
 
                 const SizedBox(height: 20),
 
-                Row(
-                  children: [
+          if (trip.status == "Scheduled")
+          Row(
+          children: [
+          Expanded(
+          child: ElevatedButton.icon(
+          icon: const Icon(Icons.play_arrow),
+          label: const Text("Start"),
+            onPressed: () async {
+              await _service.startTrip(trip.id);
 
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.play_arrow),
-                        label: const Text("Start"),
-                        onPressed: () async {
+              await TrackingManager.instance.startTracking(
+                trip.id,
+              );
 
-                          await _service.startTrip(
-                            trip.id,
-                          );
+              await _reload();
+            },
+          ),
+          ),
 
-                          await _reload();
-                        },
+          const SizedBox(width: 8),
+
+          Expanded(
+          child: ElevatedButton.icon(
+          icon: const Icon(Icons.edit),
+          label: const Text("Edit"),
+          onPressed: () async {
+          // Open TripFormScreen in edit mode
+          },
+          ),
+          ),
+
+          const SizedBox(width: 8),
+
+          Expanded(
+          child: ElevatedButton.icon(
+          style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          ),
+          icon: const Icon(Icons.cancel),
+          label: const Text("Cancel"),
+            onPressed: () async {
+              await TrackingManager.instance.stopTracking();
+
+              await _service.cancelTrip(trip.id);
+
+              await _reload();
+            },
+          ),
+          ),
+          ],
+          ),
+                    if (trip.status == "In Progress")
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.pause),
+                              label: const Text("Pause"),
+                              onPressed: () async {
+                                await _service.pauseTrip(trip.id);
+                                await _reload();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.check),
+                              label: const Text("Complete"),
+                              onPressed: () async {
+                                final result = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DeliveryFormScreen(
+                                      tripId: trip.id,
+                                    ),
+                                  ),
+                                );
+
+                                if (result == true) {
+                                  await TrackingManager.instance.stopTracking();
+                                  await _reload();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
+                    if (trip.status == "Paused")
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.play_arrow),
+                              label: const Text("Resume"),
+                              onPressed: () async {
+                                await _service.resumeTrip(trip.id);
+                                await _reload();
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              icon: const Icon(Icons.check),
+                              label: const Text("Complete"),
+                              onPressed: () async {
+                                final result = await Navigator.push<bool>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => DeliveryFormScreen(
+                                      tripId: trip.id,
+                                    ),
+                                  ),
+                                );
 
-                    const SizedBox(width: 10),
-
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.check),
-                        label: const Text("Complete"),
-                        onPressed: () async {
-
-                          await _service.completeTrip(
-                            trip.id,
-                          );
-
-                          await _reload();
-                        },
+                                if (result == true) {
+                                  await TrackingManager.instance.stopTracking();
+                                  await _reload();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-
-                  ],
-                ),
 
                 const SizedBox(height: 15),
-
+                    if (trip.status == "Completed")
                 SizedBox(
                   width: double.infinity,
 
@@ -272,9 +364,35 @@ class _TripDetailsScreenState
                     },
                   ),
                 ),
+                    const SizedBox(height: 12),
 
-              ],
-            ),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.verified),
+                        label: const Text(
+                          "VIEW PROOF OF DELIVERY",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DeliveryDetailsScreen(
+                                tripId: trip.id,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                ),
           );
         },
       ),

@@ -281,11 +281,7 @@ class _ShipmentFormScreenState extends State<ShipmentFormScreen> {
                 label: "Packages",
                 keyboard: TextInputType.number,
               ),
-              textBox(
-                controller: packagesController,
-                label: "Packages",
-                keyboard: TextInputType.number,
-              ),
+
               ListTile(
                 leading: const Icon(Icons.calendar_today),
                 title: Text(

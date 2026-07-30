@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/dispatch.dart';
+import '../../../models/dispatch.dart';
 
 class DispatchCard extends StatelessWidget {
   final Dispatch dispatch;
@@ -88,7 +88,7 @@ class DispatchCard extends StatelessWidget {
               ),
 
               Text(
-                "Vehicle : ${dispatch.vehiclePlate}",
+                "Vehicle : ${dispatch.plateNumber}",
               ),
 
               Text(

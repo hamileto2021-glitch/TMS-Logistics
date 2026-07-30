@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/trip.dart';
+import '../../../models/trip.dart';
 import 'trip_status_chip.dart';
 
 class TripHeaderCard extends StatelessWidget {
@@ -9,6 +9,7 @@ class TripHeaderCard extends StatelessWidget {
     super.key,
     required this.trip,
   });
+
 
   @override
   Widget build(BuildContext context) {

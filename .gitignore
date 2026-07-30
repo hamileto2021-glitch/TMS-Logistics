@@ -25,3 +25,15 @@ obj/
 
 # Secrets
 appsettings.Development.json
+.idea/
+
+**/build/
+**/.dart_tool/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.packages
+
+ios/Pods/
+ios/.symlinks/
+
+*.db

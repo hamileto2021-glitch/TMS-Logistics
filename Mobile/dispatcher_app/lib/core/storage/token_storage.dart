@@ -3,11 +3,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 class TokenStorage {
   static final TokenStorage _instance = TokenStorage._internal();
   static const String _tokenKey = 'auth_token';
-  final _secureStorage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(
-      encryptedSharedPreferences: true,
-    ),
-  );
+  final _secureStorage = const FlutterSecureStorage();
 
   factory TokenStorage() {
     return _instance;
@@ -17,9 +13,10 @@ class TokenStorage {
 
   Future<void> saveToken(String token) async {
     try {
-      await _secureStorage.write(key: _tokenKey, value: token);
+      final normalizedToken = token.trim();
+      await _secureStorage.write(key: _tokenKey, value: normalizedToken);
       print("[STORAGE] ✅ Token saved successfully");
-      print("[STORAGE] Token length: ${token.length}");
+      print("[STORAGE] Token length: ${normalizedToken.length}");
     } catch (e) {
       print("[STORAGE] ❌ Error saving token: $e");
     }

@@ -1,0 +1,17 @@
+{
+  "@@locale": "om",
+  "appName": "TMS Logistics",
+  "settings": "Qindaa'ina",
+  "profile": "Profaayilii Koo",
+  "changePassword": "Jecha Icciitii Jijjiiri",
+  "appearance": "Bifa Mul'ataa",
+  "language": "Afaan",
+  "notifications": "Beeksisa",
+  "security": "Nageenya",
+  "about": "Waa'ee",
+  "logout": "Ba'i",
+  "light": "Ifaa",
+  "dark": "Dukkanaa",
+  "system": "Sirna",
+  "synchronization": "Walsimsiisuu"
+}

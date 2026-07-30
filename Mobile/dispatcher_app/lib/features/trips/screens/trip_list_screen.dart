@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/widgets/feedback/app_loading.dart';
 import '../../../core/widgets/feedback/app_empty_state.dart';
 
-import '../models/trip.dart';
-import '../services/trip_service.dart';
+import '../../../models/trip.dart';
+import '../../../core/services/trip_service.dart';
 
 import '../widgets/trip_card.dart';
 import '../widgets/trip_statistics.dart';
@@ -90,15 +90,16 @@ class _TripListScreenState
         label: const Text("Trip"),
         onPressed: () async {
 
-          await Navigator.push(
+          final created = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) =>
-              const TripFormScreen(),
+              builder: (_) => const TripFormScreen(),
             ),
           );
 
-          _refresh();
+          if (created == true) {
+            _refresh();
+          }
         },
       ),
 
@@ -136,8 +137,8 @@ class _TripListScreenState
             );
           }
 
-          final trips =
-          _filter(snapshot.data!);
+          final allTrips = snapshot.data!;
+          final trips = _filter(allTrips);
 
           return RefreshIndicator(
 

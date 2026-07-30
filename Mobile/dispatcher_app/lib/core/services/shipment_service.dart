@@ -8,17 +8,31 @@ class ShipmentService {
   // GET ALL SHIPMENTS
   // ==========================
   Future<List<Shipment>> getShipments() async {
+
     final response = await ApiClient.dio.get(
       ApiEndpoints.shipments,
     );
 
-    final List data = response.data;
+    print("========== SHIPMENT API ==========");
+    print("Status: ${response.statusCode}");
+    print("Type: ${response.data.runtimeType}");
+    print("Response:");
+    print(response.data);
+    print("================================");
 
-    return data
-        .map((e) => Shipment.fromJson(e))
-        .toList();
+try {
+final List<dynamic> data = response.data;
+
+return data
+.map((e) => Shipment.fromJson(e))
+.toList();
+} catch (e, stack) {
+print("========== SHIPMENT ERROR ==========");
+print(e);
+print(stack);
+rethrow;
+}
   }
-
   // ==========================
   // GET SHIPMENT BY ID
   // ==========================
@@ -27,7 +41,7 @@ class ShipmentService {
       "${ApiEndpoints.shipments}/$id",
     );
 
-    return Shipment.fromJson(response.data);
+    return Shipment.fromJson(response.data["data"]);
   }
 
   // ==========================

@@ -7,16 +7,12 @@ import '../storage/token_storage.dart';
 import '../../models/customer.dart';
 
 class CustomerService {Future<void> createCustomer(Customer customer) async {
-  final token = await _storage.getToken();
+
 
   await ApiClient.dio.post(
     ApiEndpoints.customers,
     data: customer.toJson(),
-    options: Options(
-      headers: {
-        "Authorization": "Bearer $token",
-      },
-    ),
+
   );
 }
 
@@ -47,9 +43,11 @@ Future<void> updateCustomer(Customer customer) async {
       ),
     );
 
-    final List data = response.data;
+    final List<dynamic> data = response.data["data"];
 
-    return data.map((e) => Customer.fromJson(e)).toList();
+    return data
+        .map((e) => Customer.fromJson(e))
+        .toList();
   }
 
   Future<Customer> getCustomer(int id) async {
@@ -64,7 +62,7 @@ Future<void> updateCustomer(Customer customer) async {
       ),
     );
 
-    return Customer.fromJson(response.data);
+    return Customer.fromJson(response.data["data"]);
   }
 
   Future<void> deleteCustomer(int id) async {

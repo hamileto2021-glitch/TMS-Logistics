@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import 'api_endpoints.dart';
+import 'auth_interceptor.dart';
 
 class ApiClient {
   static final Dio dio = Dio(
@@ -12,5 +13,5 @@ class ApiClient {
         "Content-Type": "application/json",
       },
     ),
-  );
+  )..interceptors.add(AuthInterceptor());
 }

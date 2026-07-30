@@ -1,55 +1,68 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 
-import 'package:http/http.dart' as http;
-
-import '../../../core/storage/token_storage.dart';
-import '../../../core/constants/api_constants.dart';
+import '../../../core/api/api_client.dart';
+import '../models/active_trip.dart';
+import '../models/trip_history.dart';
 import '../models/driver_trip.dart';
 
 class TripService {
-  final TokenStorage _tokenStorage = TokenStorage();
+  final Dio _dio = ApiClient.dio;
 
-  Future<List<DriverTrip>> getMyTrips() async {
-    final token = await _tokenStorage.getToken();
+  Future<ActiveTrip?> getActiveTrip() async {
+    final response = await _dio.get('/driver/trips/active');
 
-    final response = await http.get(
-      Uri.parse("${ApiConstants.baseUrl}/Driver/mytrips"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final json = jsonDecode(response.body);
-
-      final List data = json["data"];
-
-      return data
-          .map((e) => DriverTrip.fromJson(e))
-          .toList();
+    if (response.data is Map &&
+        response.data['message'] == 'No active trip assigned.') {
+      return null;
     }
 
-    throw Exception("Failed to load trips");
+    return ActiveTrip.fromJson(response.data);
   }
+
+  Future<List<TripHistory>> getTripHistory() async {
+    final response = await _dio.get('/driver/trips/history');
+
+    return (response.data as List)
+        .map((e) => TripHistory.fromJson(e))
+        .toList();
+  }
+
   Future<bool> startTrip(int tripId) async {
-    final token = await _tokenStorage.getToken();
-
-    final response = await http.post(
-      Uri.parse("${ApiConstants.baseUrl}/Driver/trips/$tripId/start"),
-      headers: {
-        "Authorization": "Bearer $token",
-        "Content-Type": "application/json",
-      },
+    final response = await _dio.post(
+      '/driver/trips/$tripId/start',
     );
 
-    if (response.statusCode == 200) {
-      return true;
-    }
-
-    print("Status Code: ${response.statusCode}");
-    print("Response: ${response.body}");
-
-    throw Exception(response.body);
+    return response.statusCode == 200;
   }
+
+  Future<bool> pauseTrip(int tripId, String reason) async {
+    final response = await _dio.post(
+      '/driver/trips/$tripId/pause',
+      data: reason,
+    );
+
+    return response.statusCode == 200;
+  }
+
+  Future<bool> resumeTrip(int tripId) async {
+    final response = await _dio.post(
+      '/driver/trips/$tripId/resume',
+    );
+
+    return response.statusCode == 200;
+  }
+Future<List<DriverTrip>> getMyTrips() async {
+try {
+  final response = await _dio.get('/DriverTrips/my-trips');
+
+print(response.data);
+
+return (response.data as List)
+.map((e) => DriverTrip.fromJson(e))
+.toList();
+} catch (e) {
+print("getMyTrips ERROR: $e");
+rethrow;
+}
+}
 }
